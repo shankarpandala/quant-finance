@@ -11,87 +11,125 @@ function InteractiveTokenomics() {
   const [totalSupply, setTotalSupply] = useState(1000)
   const [circulatingPct, setCirculatingPct] = useState(40)
   const [vestingMonths, setVestingMonths] = useState(24)
-  const [inflationRate, setInflationRate] = useState(5)
-  const [burnRate, setBurnRate] = useState(2)
+  const [monthlyUnlock, setMonthlyUnlock] = useState(2.5)
+  const [tdsTaxRate, setTdsTaxRate] = useState(1)
 
   const circulatingSupply = totalSupply * circulatingPct / 100
-  const fdvPrice = 10
-  const fdv = totalSupply * fdvPrice
-  const marketCap = circulatingSupply * fdvPrice
-  const fdvMcRatio = fdv / marketCap
-  const netInflation = inflationRate - burnRate
-  const monthlyUnlock = (totalSupply - circulatingSupply) / vestingMonths
-  const unlockPressure = (monthlyUnlock / circulatingSupply) * 100
+  const fullyDilutedMcap = totalSupply * 10  // $10 per token assumed
+  const currentMcap = circulatingSupply * 10
+  const mcapRatio = (fullyDilutedMcap / currentMcap).toFixed(2)
 
-  const futureSupply = Array.from({ length: 6 }, (_, i) => {
-    const month = (i + 1) * 4
-    const unlocked = Math.min(totalSupply, circulatingSupply + monthlyUnlock * month)
-    const inflated = unlocked * Math.pow(1 + netInflation / 100 / 12, month)
-    return { month, supply: inflated }
-  })
+  const monthsToFullCirculation = Math.ceil((100 - circulatingPct) / monthlyUnlock)
+  const inflationRate = (monthlyUnlock * 12 / circulatingPct * 100).toFixed(1)
+
+  const tdsImpact = (tdsTaxRate / 100 * 2).toFixed(2) // round-trip
+  const effectiveSpread = (0.1 + parseFloat(tdsImpact)).toFixed(2)
+
+  // Unlock schedule visualization
+  const unlockData = []
+  let cumPct = circulatingPct
+  for (let m = 0; m <= Math.min(vestingMonths, 48); m++) {
+    unlockData.push({ month: m, pct: Math.min(cumPct, 100) })
+    cumPct += monthlyUnlock
+  }
 
   return (
     <div className="my-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900/50">
       <h3 className="mb-1 text-base font-bold text-gray-800 dark:text-gray-200">
-        Interactive: Token Supply Dynamics
+        Interactive: Token Unlock & Indian TDS Impact Analyzer
       </h3>
       <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-        Model token supply dynamics including vesting unlocks, inflation, and burns
-        to assess supply-side selling pressure.
+        Model token unlock schedules and analyze the impact of India's 1% TDS on VDA
+        (Virtual Digital Assets) on trading economics.
       </p>
 
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-5">
         <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
-          <span>Total: {totalSupply}M</span>
+          <span>Total Supply = {totalSupply}M</span>
           <input type="range" min="100" max="10000" step="100" value={totalSupply}
             onChange={e => setTotalSupply(parseInt(e.target.value))}
             className="h-2 w-full cursor-pointer accent-indigo-500" />
         </label>
         <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
-          <span>Circulating: {circulatingPct}%</span>
+          <span>Circulating = {circulatingPct}%</span>
           <input type="range" min="5" max="100" step="5" value={circulatingPct}
             onChange={e => setCirculatingPct(parseInt(e.target.value))}
             className="h-2 w-full cursor-pointer accent-indigo-500" />
         </label>
         <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
-          <span>Vesting: {vestingMonths}mo</span>
-          <input type="range" min="6" max="60" step="3" value={vestingMonths}
+          <span>Vesting = {vestingMonths} months</span>
+          <input type="range" min="6" max="48" step="3" value={vestingMonths}
             onChange={e => setVestingMonths(parseInt(e.target.value))}
             className="h-2 w-full cursor-pointer accent-indigo-500" />
         </label>
         <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
-          <span>Inflation: {inflationRate}%</span>
-          <input type="range" min="0" max="20" step="0.5" value={inflationRate}
-            onChange={e => setInflationRate(parseFloat(e.target.value))}
+          <span>Monthly Unlock = {monthlyUnlock}%</span>
+          <input type="range" min="0.5" max="10" step="0.5" value={monthlyUnlock}
+            onChange={e => setMonthlyUnlock(parseFloat(e.target.value))}
             className="h-2 w-full cursor-pointer accent-indigo-500" />
         </label>
         <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
-          <span>Burn: {burnRate}%</span>
-          <input type="range" min="0" max="15" step="0.5" value={burnRate}
-            onChange={e => setBurnRate(parseFloat(e.target.value))}
+          <span>TDS Rate = {tdsTaxRate}%</span>
+          <input type="range" min="0" max="5" step="0.5" value={tdsTaxRate}
+            onChange={e => setTdsTaxRate(parseFloat(e.target.value))}
             className="h-2 w-full cursor-pointer accent-indigo-500" />
         </label>
       </div>
 
-      <svg viewBox="0 0 500 130" className="w-full max-w-lg mx-auto block" aria-label="Supply projection">
-        {futureSupply.map((s, i) => {
-          const x = 60 + i * 72
-          const barHeight = Math.min(80, s.supply / totalSupply * 60)
+      <svg viewBox="0 0 520 200" className="w-full max-w-xl mx-auto block" aria-label="Token unlock schedule">
+        {/* Unlock curve */}
+        <text x="260" y="14" textAnchor="middle" className="text-[10px] font-semibold" fill="#6b7280">
+          Token Unlock Schedule | FDV/MCap Ratio: {mcapRatio}x
+        </text>
+
+        {/* Grid */}
+        {[0, 25, 50, 75, 100].map(pct => {
+          const y = 160 - (pct / 100) * 130
           return (
-            <g key={i}>
-              <rect x={x} y={90 - barHeight} width="50" height={barHeight}
-                fill="#6366f1" opacity={0.4 + i * 0.1} rx="4" />
-              <text x={x + 25} y="105" textAnchor="middle" className="text-[8px]" fill="#6b7280">
-                M{s.month}
-              </text>
-              <text x={x + 25} y={85 - barHeight} textAnchor="middle" className="text-[7px]" fill="#374151">
-                {s.supply.toFixed(0)}M
-              </text>
+            <g key={pct}>
+              <line x1="50" y1={y} x2="490" y2={y} stroke="#e5e7eb" strokeWidth="0.5" />
+              <text x="45" y={y + 3} textAnchor="end" className="text-[7px]" fill="#9ca3af">{pct}%</text>
             </g>
           )
         })}
-        <text x="250" y="125" textAnchor="middle" className="text-[9px] fill-gray-600 dark:fill-gray-400">
-          FDV/MC: {fdvMcRatio.toFixed(1)}x | Monthly Unlock: {unlockPressure.toFixed(1)}% of circ | Net Inflation: {netInflation.toFixed(1)}%
+
+        {/* Unlock curve */}
+        {unlockData.length > 1 && (
+          <polyline fill="none" stroke="#6366f1" strokeWidth="2"
+            points={unlockData.map(d => {
+              const x = 50 + (d.month / Math.min(vestingMonths, 48)) * 440
+              const y = 160 - (d.pct / 100) * 130
+              return `${x},${y}`
+            }).join(' ')} />
+        )}
+
+        {/* Fill area */}
+        <polygon fill="#6366f1" opacity="0.1"
+          points={[
+            `50,160`,
+            ...unlockData.map(d => {
+              const x = 50 + (d.month / Math.min(vestingMonths, 48)) * 440
+              const y = 160 - (d.pct / 100) * 130
+              return `${x},${y}`
+            }),
+            `${50 + 440},160`,
+          ].join(' ')} />
+
+        <line x1="50" y1="160" x2="490" y2="160" stroke="#9ca3af" strokeWidth="1" />
+        <text x="270" y="175" textAnchor="middle" className="text-[9px]" fill="#6b7280">Months</text>
+
+        {/* Metrics */}
+        <text x="350" y="45" className="text-[8px]" fill="#6b7280">
+          Inflation: {inflationRate}% annual
+        </text>
+        <text x="350" y="58" className="text-[8px]" fill="#6b7280">
+          Full circ: ~{monthsToFullCirculation} months
+        </text>
+        <text x="350" y="71" className="text-[8px] font-bold" fill="#dc2626">
+          TDS drag: {tdsImpact}% round-trip
+        </text>
+        <text x="350" y="84" className="text-[8px]" fill="#6b7280">
+          Eff. spread: {effectiveSpread}%
         </text>
       </svg>
     </div>
@@ -102,293 +140,281 @@ export default function TokenomicsAnalysis() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-        Tokenomics Analysis
+        Tokenomics Analysis & Indian VDA Taxation
       </h2>
       <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-        Tokenomics -- the economic design of a token's supply, distribution, and
-        utility -- is a critical factor in crypto asset valuation. Quantitative
-        tokenomics analysis models the supply-side dynamics (vesting, inflation, burns)
-        and demand-side factors (utility, staking, governance) to predict future
-        selling pressure and fair value.
+        Tokenomics -- the economic design of crypto tokens -- is a critical alpha
+        source in crypto quantitative trading. Token unlock schedules, supply
+        inflation, and vesting cliffs create predictable selling pressure that can
+        be systematically traded. For Indian crypto traders, the 1% TDS (Tax
+        Deducted at Source) on VDA (Virtual Digital Assets) transactions introduced
+        in the 2022 Union Budget, combined with the 30% flat tax on crypto gains,
+        fundamentally alters trading economics and strategy viability.
       </p>
 
       <DefinitionBlock
-        title="Fully Diluted Valuation (FDV)"
-        label="Definition 3.1"
-        definition="FDV is the theoretical market capitalization if all tokens (including unvested, locked, and yet-to-be-minted tokens) were in circulation at the current market price. The FDV-to-market-cap ratio measures how much additional supply pressure exists from future token unlocks."
-        notation={<><InlineMath math="\text{FDV} = P \times S_{\text{total}}" />, <InlineMath math="\text{Market Cap} = P \times S_{\text{circulating}}" />, <InlineMath math="\text{FDV/MC} = S_{\text{total}} / S_{\text{circulating}}" />. A ratio above 3x signals significant future dilution risk.</>}
+        title="Tokenomics"
+        label="Definition 17.7"
+        definition="Tokenomics refers to the economic model governing a cryptocurrency token, including its total supply, emission schedule, vesting periods for team/investor allocations, staking rewards, burn mechanisms, and governance utility. Quantitative tokenomics analysis models the supply-demand dynamics to forecast price pressure from upcoming token unlocks."
+        notation={<>The circulating supply ratio is <InlineMath math="r_t = S_t^{\text{circ}} / S^{\text{total}}" /> and the dilution rate is <InlineMath math="\delta_t = \frac{\Delta S_t^{\text{circ}}}{S_t^{\text{circ}}}" />.</>}
       />
 
       <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-        Supply Pressure Model
+        Token Unlock Impact Model
       </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        When locked tokens vest and enter circulation, they create potential sell
+        pressure. The expected price impact of an unlock event can be modelled as:
+      </p>
 
-      <BlockMath math="S_t = S_0 + \underbrace{\sum_{\tau=0}^{t} U_\tau}_{\text{vesting unlocks}} + \underbrace{S_t \cdot r_{\text{inflation}}}_{\text{staking rewards}} - \underbrace{B_t}_{\text{burns}}" />
+      <BlockMath math="\Delta P_{\text{unlock}} = -\eta \cdot \frac{U_t}{V_{\text{daily}}} \cdot P_t" />
 
-      <BlockMath math="\text{Sell Pressure}_t = \frac{U_t + S_t \cdot r_{\text{inflation}} - B_t}{S_{\text{circulating},t}} \times P_t" />
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="U_t" /> is the unlock amount,{' '}
+        <InlineMath math="V_{\text{daily}}" /> is average daily trading volume,{' '}
+        <InlineMath math="P_t" /> is current price, and{' '}
+        <InlineMath math="\eta" /> is the sell-through rate (fraction of unlocked
+        tokens actually sold). Empirically, <InlineMath math="\eta \approx 0.3\text{-}0.6" />{' '}
+        for investor allocations and <InlineMath math="\eta \approx 0.1\text{-}0.2" />{' '}
+        for team allocations.
+      </p>
+
+      <BlockMath math="\text{FDV/MCap Ratio} = \frac{S^{\text{total}} \cdot P}{S^{\text{circ}} \cdot P} = \frac{1}{r_t}" />
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        India's 1% TDS on VDA (Section 194S)
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Since July 2022, all crypto transactions in India attract 1% TDS under
+        Section 194S of the Income Tax Act. This creates a significant drag on
+        high-frequency trading strategies:
+      </p>
+
+      <BlockMath math="\text{Annual TDS Drag} = 2 \times \text{TDS\%} \times N_{\text{trades}} \times \bar{V}_{\text{trade}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The factor of 2 accounts for both buy and sell sides. Combined with the
+        30% flat tax (no loss offset) under Section 115BBH, the effective taxation
+        makes many strategies unprofitable that would work in other jurisdictions:
+      </p>
+
+      <BlockMath math="\text{Effective Tax} = 0.30 \cdot \max(\text{gains}, 0) + 0.01 \cdot |\text{turnover}|" />
 
       <TheoremBlock
-        title="Token Unlock Impact on Price"
-        label="Empirical Finding 3.1"
-        statement={<>Large token unlock events (releasing more than 5% of circulating supply) cause statistically significant negative price impact. Analysis of 200 major unlock events (2021--2024): <BlockMath math="\text{CAR}(-5, +5) = -8.2\% \pm 3.1\% \quad (p < 0.001)" /> The impact scales with unlock size relative to daily trading volume: <InlineMath math="\Delta P \propto -\alpha \cdot U / V_{\text{daily}}" /> with <InlineMath math="\alpha \approx 0.15" />. Markets partially price in known unlocks 3--5 days before the event.</>}
-        proof={<>Event study methodology applied to scheduled token unlocks tracked via TokenUnlocks.app. Abnormal returns computed relative to BTC returns as the market benchmark. The pre-event drift suggests partial but incomplete anticipation by the market. The effect is strongest for VC-backed tokens where unlock recipients are known to be financially motivated sellers.</>}
+        title="Break-Even Sharpe Under Indian VDA Tax"
+        label="Theorem 17.3"
+        statement={<>For a crypto trading strategy with <InlineMath math="N" /> trades per year, average trade size <InlineMath math="V" />, and TDS rate <InlineMath math="\tau" />, the minimum Sharpe ratio required for profitability after tax is:</>}
+        formula="S_{\min} = \frac{2N\tau + 0.3 \cdot \mu^+ \cdot \text{Capital}}{\sigma \cdot \text{Capital}} \cdot \sqrt{252}"
+        proof={<>Setting after-tax return to zero: gross P&L minus TDS drag (2 * N * tau * V) minus income tax (0.3 * gains) must equal zero. Since losses cannot offset gains under Section 115BBH, the effective tax rate on gross P&L is higher than 30%. For a strategy with 100 daily trades of INR 1 lakh each, the annual TDS alone is INR 73 lakh (2 * 252 * 100 * 0.01 * 100000), requiring minimum annualized return of approximately 73% just to cover TDS -- pushing the minimum viable Sharpe above 3.</>}
       />
 
       <InteractiveTokenomics />
 
       <PythonCode
-        title="tokenomics_analyzer.py"
+        title="tokenomics_india.py"
         runnable
         code={`import numpy as np
+from dataclasses import dataclass
+from typing import List
 
-class TokenomicsAnalyzer:
-    """Quantitative analysis of token supply dynamics."""
+@dataclass
+class TokenUnlock:
+    month: int
+    amount_pct: float
+    category: str  # 'team', 'investor', 'ecosystem', 'community'
+    sell_through: float = 0.5  # Expected fraction sold
 
-    def __init__(self, total_supply, initial_circulating, price):
-        self.total_supply = total_supply
-        self.circulating = initial_circulating
-        self.price = price
+@dataclass
+class IndianVDATax:
+    """India VDA taxation model (2022 onwards)."""
+    tds_rate: float = 0.01          # 1% TDS under Section 194S
+    income_tax_rate: float = 0.30   # 30% flat tax, Section 115BBH
+    surcharge_rate: float = 0.0     # Depends on income bracket
+    cess_rate: float = 0.04         # Health and Education Cess
+    can_offset_losses: bool = False  # No loss offset allowed
 
-    @property
-    def fdv(self):
-        return self.total_supply * self.price
+    def calculate_tds(self, trade_value):
+        """TDS on a single trade."""
+        return trade_value * self.tds_rate
 
-    @property
-    def market_cap(self):
-        return self.circulating * self.price
+    def annual_tds_drag(self, daily_trades, avg_trade_value, trading_days=252):
+        """Total annual TDS drag."""
+        return 2 * daily_trades * avg_trade_value * self.tds_rate * trading_days
 
-    @property
-    def fdv_mc_ratio(self):
-        return self.fdv / max(self.market_cap, 1)
-
-    def project_supply(self, months, vesting_schedule, inflation_rate=0.05,
-                       burn_rate=0.02):
-        """Project token supply over time."""
-        projections = []
-        current_supply = self.circulating
-
-        for m in range(1, months + 1):
-            # Vesting unlocks
-            unlock = vesting_schedule.get(m, 0)
-            current_supply += unlock
-
-            # Monthly inflation and burn
-            monthly_inflation = current_supply * inflation_rate / 12
-            monthly_burn = current_supply * burn_rate / 12
-            current_supply += monthly_inflation - monthly_burn
-
-            projections.append({
-                'month': m,
-                'circulating': current_supply,
-                'unlock': unlock,
-                'inflation': monthly_inflation,
-                'burn': monthly_burn,
-                'circ_pct': current_supply / self.total_supply * 100,
-            })
-
-        return projections
-
-    def unlock_impact_estimate(self, unlock_amount, daily_volume, alpha=0.15):
-        """Estimate price impact of a token unlock."""
-        unlock_ratio = unlock_amount / self.circulating
-        volume_ratio = unlock_amount * self.price / daily_volume
-        estimated_impact = -alpha * volume_ratio
-        selling_days = unlock_amount * self.price / (daily_volume * 0.1)
-
+    def effective_tax(self, gross_profit, gross_loss, turnover):
+        """Total effective tax burden."""
+        tds = turnover * self.tds_rate
+        # No loss offset: tax only on profits
+        income_tax = max(0, gross_profit) * self.income_tax_rate
+        cess = income_tax * self.cess_rate
+        total = tds + income_tax + cess
         return {
-            'unlock_pct_circ': unlock_ratio * 100,
-            'volume_ratio': volume_ratio,
-            'estimated_impact_pct': estimated_impact * 100,
-            'selling_duration_days': selling_days,
+            'tds': tds,
+            'income_tax': income_tax,
+            'cess': cess,
+            'total': total,
+            'effective_rate': total / max(gross_profit - gross_loss, 1) * 100,
         }
 
-    def valuation_score(self, revenue_annual=0, active_users=0, tvl=0):
-        """Compute tokenomics-adjusted valuation score."""
-        scores = {}
+class TokenomicsAnalyzer:
+    """Analyze token unlock schedules and price impact."""
 
-        # FDV/MC ratio score
-        ratio = self.fdv_mc_ratio
-        scores['fdv_mc'] = 1 if ratio < 2 else 0 if ratio < 5 else -1
+    def __init__(self, total_supply, circulating_pct, price):
+        self.total_supply = total_supply
+        self.circulating_pct = circulating_pct
+        self.price = price
+        self.unlocks: List[TokenUnlock] = []
 
-        # Revenue-based (if applicable)
-        if revenue_annual > 0:
-            pe = self.fdv / revenue_annual
-            scores['pe_ratio'] = 1 if pe < 50 else 0 if pe < 200 else -1
+    def add_unlock(self, unlock: TokenUnlock):
+        self.unlocks.append(unlock)
 
-        # User-based (Metcalfe)
-        if active_users > 0:
-            mc_per_user = self.market_cap / active_users
-            scores['mc_per_user'] = 1 if mc_per_user < 100 else 0
+    def compute_supply_schedule(self, months=36):
+        """Project circulating supply over time."""
+        schedule = []
+        circ = self.circulating_pct
+        for m in range(months):
+            month_unlocks = [u for u in self.unlocks if u.month == m]
+            for u in month_unlocks:
+                circ = min(100, circ + u.amount_pct)
+            schedule.append({'month': m, 'circulating_pct': circ})
+        return schedule
 
-        # TVL-based (for DeFi tokens)
-        if tvl > 0:
-            mc_tvl = self.market_cap / tvl
-            scores['mc_tvl'] = 1 if mc_tvl < 1 else 0 if mc_tvl < 3 else -1
+    def estimate_sell_pressure(self, daily_volume):
+        """Estimate monthly sell pressure from unlocks."""
+        pressures = []
+        for u in self.unlocks:
+            unlock_value = self.total_supply * u.amount_pct / 100 * self.price
+            expected_sell = unlock_value * u.sell_through
+            days_to_sell = max(1, expected_sell / daily_volume * 5)
+            price_impact = -0.1 * (expected_sell / daily_volume)
+            pressures.append({
+                'month': u.month,
+                'category': u.category,
+                'unlock_value': unlock_value,
+                'sell_pressure': expected_sell,
+                'days_to_absorb': days_to_sell,
+                'est_price_impact': price_impact,
+            })
+        return pressures
 
-        composite = np.mean(list(scores.values()))
-        return {'scores': scores, 'composite': composite,
-                'verdict': 'UNDERVALUED' if composite > 0.3 else
-                          'OVERVALUED' if composite < -0.3 else 'FAIR'}
+# --- Demo ---
+print("=== Tokenomics Analysis & Indian VDA Tax ===\\n")
 
-# Analyze a hypothetical DeFi token
+# 1. Token Unlock Analysis
 analyzer = TokenomicsAnalyzer(
-    total_supply=1_000_000_000,    # 1B tokens
-    initial_circulating=350_000_000,  # 350M (35%)
-    price=2.50
+    total_supply=1_000_000_000,  # 1B tokens
+    circulating_pct=35,
+    price=2.50  # USD
 )
 
-print("=" * 55)
-print("TOKENOMICS ANALYSIS")
-print("=" * 55)
-print(f"\\nToken Metrics:")
-print(f"  Total Supply:     {analyzer.total_supply/1e6:.0f}M")
-print(f"  Circulating:      {analyzer.circulating/1e6:.0f}M ({analyzer.circulating/analyzer.total_supply:.0%})")
-print(f"  Price:            ${analyzer.price}")
-print(f"  Market Cap:       ${analyzer.market_cap/1e6:.0f}M")
-print(f"  FDV:              ${analyzer.fdv/1e6:.0f}M")
-print(f"  FDV/MC Ratio:     {analyzer.fdv_mc_ratio:.1f}x")
+# Typical unlock schedule
+unlocks = [
+    TokenUnlock(6, 5.0, 'investor', 0.6),
+    TokenUnlock(12, 10.0, 'investor', 0.5),
+    TokenUnlock(12, 5.0, 'team', 0.15),
+    TokenUnlock(18, 8.0, 'investor', 0.4),
+    TokenUnlock(24, 5.0, 'team', 0.2),
+    TokenUnlock(24, 10.0, 'ecosystem', 0.1),
+]
+for u in unlocks:
+    analyzer.add_unlock(u)
 
-# Vesting schedule (monthly unlocks in tokens)
-vesting = {3: 50e6, 6: 80e6, 9: 50e6, 12: 100e6, 15: 50e6, 18: 80e6,
-           21: 50e6, 24: 90e6}
+schedule = analyzer.compute_supply_schedule(30)
+print("--- Supply Schedule ---")
+for s in schedule[::6]:
+    print(f"  Month {s['month']:2d}: Circulating = {s['circulating_pct']:.1f}%")
 
-projections = analyzer.project_supply(24, vesting, inflation_rate=0.06, burn_rate=0.02)
-print(f"\\nSupply Projections:")
-for p in projections[::3]:
-    print(f"  Month {p['month']:>2d}: Circ={p['circulating']/1e6:.0f}M "
-          f"({p['circ_pct']:.0f}%) Unlock={p['unlock']/1e6:.0f}M "
-          f"Inflation={p['inflation']/1e6:.1f}M Burn={p['burn']/1e6:.1f}M")
+sell_pressure = analyzer.estimate_sell_pressure(daily_volume=5_000_000)
+print("\\n--- Sell Pressure from Unlocks ---")
+for sp in sell_pressure:
+    print(f"  Month {sp['month']:2d} ({sp['category']:>10}): "
+          f"Unlock=${sp['unlock_value']/1e6:.1f}M, "
+          f"Sell=${sp['sell_pressure']/1e6:.1f}M, "
+          f"Impact={sp['est_price_impact']:.1%}")
 
-# Unlock impact analysis
-major_unlock = 100e6  # 100M token unlock
-daily_vol = 50e6  # $50M daily volume
-impact = analyzer.unlock_impact_estimate(major_unlock, daily_vol)
-print(f"\\nMajor Unlock Impact (100M tokens):")
-print(f"  % of Circulating: {impact['unlock_pct_circ']:.1f}%")
-print(f"  Volume Ratio:     {impact['volume_ratio']:.1f}x daily")
-print(f"  Est. Price Impact:{impact['estimated_impact_pct']:+.1f}%")
-print(f"  Selling Duration: ~{impact['selling_duration_days']:.0f} days")
+# 2. Indian VDA Tax Impact
+print("\\n=== Indian VDA Tax Analysis ===")
+tax = IndianVDATax()
 
-# Valuation
-val = analyzer.valuation_score(revenue_annual=30e6, active_users=100000, tvl=400e6)
-print(f"\\nValuation Score:")
-for metric, score in val['scores'].items():
-    label = 'Cheap' if score > 0 else 'Expensive' if score < 0 else 'Fair'
-    print(f"  {metric:15s}: {score:+d} ({label})")
-print(f"  Composite:        {val['composite']:+.2f} -> {val['verdict']}")`}
+# Scenario: Algorithmic trader on WazirX/CoinDCX
+scenarios = [
+    {'name': 'Swing Trader', 'daily_trades': 2, 'avg_value': 50000},
+    {'name': 'Day Trader', 'daily_trades': 20, 'avg_value': 100000},
+    {'name': 'HF Bot', 'daily_trades': 200, 'avg_value': 50000},
+]
+
+for sc in scenarios:
+    tds_annual = tax.annual_tds_drag(
+        sc['daily_trades'], sc['avg_value']
+    )
+    annual_turnover = 2 * sc['daily_trades'] * sc['avg_value'] * 252
+
+    # Assume 20% gross return on capital
+    capital = sc['daily_trades'] * sc['avg_value'] * 5
+    gross_profit = capital * 0.20
+    gross_loss = capital * 0.08
+
+    tax_result = tax.effective_tax(gross_profit, gross_loss, annual_turnover)
+
+    print(f"\\n  --- {sc['name']} ---")
+    print(f"  Capital: INR {capital:,.0f}")
+    print(f"  Annual turnover: INR {annual_turnover:,.0f}")
+    print(f"  TDS drag: INR {tds_annual:,.0f}")
+    print(f"  Income tax: INR {tax_result['income_tax']:,.0f}")
+    print(f"  Total tax: INR {tax_result['total']:,.0f}")
+    print(f"  Effective rate: {tax_result['effective_rate']:.1f}%")
+    print(f"  TDS as % of gross P&L: "
+          f"{tds_annual / max(gross_profit - gross_loss, 1) * 100:.1f}%")
+
+print("\\n--- Key Insight ---")
+print("The 1% TDS makes HF strategies unviable in India.")
+print("Focus on: low-frequency, high-conviction token unlock trades.")`}
       />
 
       <ExampleBlock
-        title="Evaluating a Token Unlock Event"
+        title="Token Unlock Trade on Indian Exchange"
         difficulty="intermediate"
-        problem="A token has 500M circulating supply (out of 2B total), price $3.00, and $30M daily volume. A cliff unlock of 200M tokens (VC allocation) is scheduled in 2 weeks. Estimate the price impact and optimal trading strategy."
+        problem="Token XYZ has a 10% investor unlock (100M tokens at $2 each = $200M) in 30 days. Daily volume is $10M. You want to short on WazirX pre-unlock. With 1% TDS, what is the minimum expected drop needed for profitability on a $50,000 (INR ~42 lakh) position?"
         solution={[
           {
-            step: 'FDV/MC ratio',
-            formula: '\\text{FDV} = 2B \\times 3 = \\$6B, \\; \\text{MC} = 500M \\times 3 = \\$1.5B, \\; \\text{Ratio} = 4x',
-            explanation: 'High FDV/MC indicates significant future dilution.',
+            step: 'Calculate TDS cost',
+            formula: '\\text{TDS} = 2 \\times 0.01 \\times 50000 = \\$1,000',
+            explanation: 'Round-trip TDS: 1% on buy + 1% on sell = 2% of position size.',
           },
           {
-            step: 'Unlock size analysis',
-            formula: '\\text{Unlock} = \\frac{200M}{500M} = 40\\% \\text{ of circulating supply}',
+            step: 'Estimate sell pressure and expected drop',
+            formula: '\\text{Sell Pressure} = 0.5 \\times \\$200M = \\$100M',
+            explanation: 'With 50% sell-through rate, $100M will hit the market over ~50 days (100M / 10M daily volume * 5x).',
           },
           {
-            step: 'Volume-adjusted impact',
-            formula: '\\Delta P \\approx -0.15 \\times \\frac{200M \\times 3}{30M} = -0.15 \\times 20 = -300\\% \\text{ (capped)}',
-            explanation: 'The naive formula gives extreme impact because unlock value is 20x daily volume. In practice, selling is spread over weeks.',
-          },
-          {
-            step: 'Realistic estimate',
-            formula: '\\text{Impact} \\approx -15\\% \\text{ to } -30\\% \\text{ over 2--4 weeks}',
-            explanation: 'Strategy: short perps 3--5 days before unlock (market partially prices in), cover gradually as selling pressure absorbs. Size conservatively as timing is uncertain.',
+            step: 'Compute break-even',
+            formula: '\\text{Min drop} = \\frac{\\$1000 + \\text{spread cost}}{\\$50000} = \\frac{\\$1000 + \\$50}{\\$50000} = 2.1\\%',
+            explanation: 'The token must drop at least 2.1% after the unlock for the trade to be profitable after Indian TDS. The estimated 10% sell-pressure-driven drop ($100M vs $10M daily volume) far exceeds this threshold, making it viable.',
           },
         ]}
       />
 
-      <NoteBlock title="Tokenomics Red Flags" type="warning">
+      <NoteBlock title="India VDA Regulatory Landscape" type="warning">
         <p>
-          Watch for these tokenomics red flags: FDV/MC ratio above 10x (extreme
-          future dilution), large cliff unlocks for VC/team (often followed by
-          aggressive selling), high inflation without corresponding utility demand,
-          lack of burn mechanism in fee-generating protocols, and concentration of
-          supply in few wallets (whale manipulation risk). Indian crypto investors
-          should pay particular attention to FDV/MC ratios, as many tokens launch
-          with low circulating supply to create artificially high market cap rankings.
+          Indian crypto traders face a uniquely harsh tax regime: (1) <strong>30% flat tax</strong>{' '}
+          on gains with no loss offset between different VDAs (Section 115BBH),
+          (2) <strong>1% TDS</strong> on all transactions above INR 10,000 (Section 194S),
+          (3) <strong>no deduction</strong> for any expenses except acquisition cost, and
+          (4) <strong>no carry-forward</strong> of losses. This makes high-frequency strategies
+          unviable and pushes Indian quants toward low-frequency, high-conviction trades
+          based on tokenomics events (unlocks, burns, governance changes).
         </p>
       </NoteBlock>
-
-      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-        Further Reading and Resources
-      </h3>
-      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-        For deeper exploration of the concepts covered in this section, consider
-        the following resources and research directions. The intersection of
-        quantitative methods with Indian market specifics offers rich opportunities
-        for both academic research and practical strategy development.
-      </p>
-
-      <div className="overflow-x-auto">
-        <table className="mx-auto my-4 text-sm border-collapse">
-          <thead>
-            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
-              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Resource</th>
-              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Type</th>
-              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Relevance</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-700 dark:text-gray-300">
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td className="px-4 py-2">NSE Research Papers</td>
-              <td className="px-4 py-2">Academic</td>
-              <td className="px-4 py-2">Indian market empirics</td>
-            </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td className="px-4 py-2">SEBI Discussion Papers</td>
-              <td className="px-4 py-2">Regulatory</td>
-              <td className="px-4 py-2">Market structure rules</td>
-            </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td className="px-4 py-2">RBI Working Papers</td>
-              <td className="px-4 py-2">Policy</td>
-              <td className="px-4 py-2">Macro-financial linkages</td>
-            </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td className="px-4 py-2">CMIE ProwessIQ</td>
-              <td className="px-4 py-2">Data</td>
-              <td className="px-4 py-2">Indian corporate financials</td>
-            </tr>
-            <tr>
-              <td className="px-4 py-2">IIM/ISB Research</td>
-              <td className="px-4 py-2">Academic</td>
-              <td className="px-4 py-2">Indian finance research</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <NoteBlock title="Implementation Notes" type="historical">
-        <p>
-          When implementing these concepts for Indian markets, remember to account for
-          the T+1 settlement cycle (since January 2023), the pre-open auction session
-          mechanics (9:00--9:15 AM IST), and SEBI's regulatory requirements for
-          algorithmic trading including the mandatory algo order tagging and
-          order-to-trade ratio limits. Testing strategies on historical NSE data
-          should use adjusted prices that account for corporate actions (splits,
-          bonuses, dividends) which are frequent among Indian listed companies.
-        </p>
-      </NoteBlock>
-
-
 
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
-          Tokenomics analysis is the crypto equivalent of fundamental analysis,
-          focusing on supply dynamics rather than income statements. The key
-          quantitative inputs are FDV/MC ratio (dilution risk), vesting unlock
-          schedule (selling pressure calendar), net inflation rate (supply growth),
-          and demand-side metrics (revenue, users, TVL). Combining supply-side
-          tokenomics with on-chain valuation metrics (NVT, MVRV) provides a
-          comprehensive framework for crypto asset valuation.
+          Tokenomics analysis is a unique alpha source in crypto that has no direct analogue
+          in traditional finance. Token unlocks are <strong>scheduled, public events</strong>{' '}
+          that create predictable sell pressure -- making them ideal for systematic trading.
+          For Indian traders, the 1% TDS constraint means focusing on large, infrequent
+          unlock events where expected price impact (typically 5-20% for major unlocks
+          relative to daily volume) far exceeds the 2% round-trip TDS cost. Always factor
+          in the 30% tax on gains when computing strategy viability.
         </p>
       </NoteBlock>
     </div>

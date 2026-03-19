@@ -7,37 +7,97 @@ import ExampleBlock from '../../../components/content/ExampleBlock.jsx'
 import NoteBlock from '../../../components/content/NoteBlock.jsx'
 import PythonCode from '../../../components/content/PythonCode.jsx'
 
-function InteractiveViz() {
-  const [driftScale, setDriftScale] = useState(0.1)
-  const [diffusionScale, setDiffusionScale] = useState(0.2)
-  const [nPaths, setNPaths] = useState(5)
-  const paths = Array.from({length: nPaths}, (_, p) => {
-    let price = 100; const path = [price]
-    for (let t = 1; t <= 20; t++) {
-      const drift = driftScale * (100 - price) * 0.01
-      const diffusion = diffusionScale * Math.sin(p * 1.5 + t * 0.3) * 0.5
-      price = price + drift + diffusion
-      path.push(price)
+function InteractiveNeuralSDE() {
+  const [driftScale, setDriftScale] = useState(0.12)
+  const [volScale, setVolScale] = useState(0.18)
+  const [meanRevSpeed, setMeanRevSpeed] = useState(2.0)
+  const [volOfVol, setVolOfVol] = useState(0.5)
+
+  const days = 60
+  const dt = 1 / 252
+  const paths = []
+  const volPaths = []
+  for (let p = 0; p < 4; p++) {
+    const pricePath = [22000]
+    const vPath = [volScale]
+    let seed = (p + 1) * 31 + 17
+    for (let d = 1; d < days; d++) {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff
+      const z1 = ((seed / 0x7fffffff) - 0.5) * 3.4
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff
+      const z2 = ((seed / 0x7fffffff) - 0.5) * 3.4
+      const prevVol = vPath[d - 1]
+      const newVol = Math.max(0.05, prevVol + meanRevSpeed * (volScale - prevVol) * dt + volOfVol * prevVol * Math.sqrt(dt) * z2)
+      vPath.push(newVol)
+      const drift = (driftScale - 0.5 * newVol * newVol) * dt
+      const diff = newVol * Math.sqrt(dt) * z1
+      pricePath.push(pricePath[d - 1] * Math.exp(drift + diff))
     }
-    return path
-  })
+    paths.push(pricePath)
+    volPaths.push(vPath)
+  }
+
+  const allPrices = paths.flat()
+  const minP = Math.min(...allPrices)
+  const maxP = Math.max(...allPrices)
+  const priceRange = maxP - minP || 1
+
+  const colors = ['#6366f1', '#22c55e', '#ef4444', '#f59e0b']
+
   return (
     <div className="my-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900/50">
-      <h3 className="mb-1 text-base font-bold text-gray-800 dark:text-gray-200">Interactive: Neural SDE Path Simulation</h3>
-      <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">Adjust drift and diffusion networks to generate Nifty price paths.</p>
-      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400"><span>Drift Scale = {driftScale.toFixed(2)}</span><input type="range" min="0" max="0.5" step="0.05" value={driftScale} onChange={e => setDriftScale(parseFloat(e.target.value))} className="h-2 w-full cursor-pointer accent-indigo-500" /></label>
-        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400"><span>Diffusion Scale = {diffusionScale.toFixed(2)}</span><input type="range" min="0.05" max="0.5" step="0.05" value={diffusionScale} onChange={e => setDiffusionScale(parseFloat(e.target.value))} className="h-2 w-full cursor-pointer accent-indigo-500" /></label>
-        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400"><span>Paths = {nPaths}</span><input type="range" min="1" max="10" step="1" value={nPaths} onChange={e => setNPaths(parseInt(e.target.value))} className="h-2 w-full cursor-pointer accent-indigo-500" /></label>
+      <h3 className="mb-1 text-base font-bold text-gray-800 dark:text-gray-200">
+        Interactive: Neural SDE Price Paths for Nifty Options
+      </h3>
+      <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+        Visualize Nifty paths under a neural SDE with learned stochastic volatility.
+        The drift and diffusion functions are parameterized by neural networks.
+      </p>
+
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
+        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+          <span>Drift <InlineMath math="\mu_\theta" /> = {(driftScale * 100).toFixed(0)}%</span>
+          <input type="range" min="-0.1" max="0.3" step="0.01" value={driftScale}
+            onChange={e => setDriftScale(parseFloat(e.target.value))}
+            className="h-2 w-full cursor-pointer accent-indigo-500" />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+          <span>Vol level <InlineMath math="\sigma_\theta" /> = {(volScale * 100).toFixed(0)}%</span>
+          <input type="range" min="0.08" max="0.4" step="0.01" value={volScale}
+            onChange={e => setVolScale(parseFloat(e.target.value))}
+            className="h-2 w-full cursor-pointer accent-indigo-500" />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+          <span>Mean Rev <InlineMath math="\kappa" /> = {meanRevSpeed.toFixed(1)}</span>
+          <input type="range" min="0.5" max="5" step="0.1" value={meanRevSpeed}
+            onChange={e => setMeanRevSpeed(parseFloat(e.target.value))}
+            className="h-2 w-full cursor-pointer accent-indigo-500" />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+          <span>Vol-of-Vol <InlineMath math="\xi" /> = {volOfVol.toFixed(1)}</span>
+          <input type="range" min="0.1" max="2" step="0.1" value={volOfVol}
+            onChange={e => setVolOfVol(parseFloat(e.target.value))}
+            className="h-2 w-full cursor-pointer accent-indigo-500" />
+        </label>
       </div>
-      <svg viewBox="0 0 400 120" className="w-full max-w-lg mx-auto block">
-        {paths.map((path, p) => (
-          <g key={p}>{path.map((price, t) => {
-            const x = 20 + t * 18; const y = 110 - (price - 90) * 5
-            return t > 0 ? (<line key={t} x1={20 + (t-1)*18} y1={110 - (path[t-1]-90)*5} x2={x} y2={y} stroke={`hsl(${p * 40 + 220}, 70%, 50%)`} strokeWidth="1.2" opacity="0.7" />) : null
-          })}</g>
-        ))}
-        <line x1="20" y1={110 - (100-90)*5} x2="380" y2={110 - (100-90)*5} stroke="#d1d5db" strokeWidth="0.5" strokeDasharray="3" />
+
+      <svg viewBox="0 0 520 180" className="w-full max-w-xl mx-auto block" aria-label="Neural SDE paths">
+        {paths.map((path, pi) => {
+          const points = path.map((p, i) => {
+            const x = 50 + (i / (days - 1)) * 440
+            const y = 160 - ((p - minP) / priceRange) * 130
+            return `${x},${y}`
+          }).join(' ')
+          return <polyline key={pi} points={points} fill="none" stroke={colors[pi]} strokeWidth="1.5" opacity="0.7" />
+        })}
+
+        <line x1="50" y1="160" x2="490" y2="160" stroke="#d1d5db" strokeWidth="1" />
+        <text x="270" y="176" textAnchor="middle" className="text-[9px]" fill="#6b7280">Trading Days</text>
+        <text x="15" y="90" textAnchor="middle" className="text-[8px]" fill="#9ca3af" transform="rotate(-90, 15, 90)">Nifty Price</text>
+
+        <text x="400" y="20" textAnchor="end" className="text-[8px]" fill="#6b7280">
+          Vol: {(volPaths[0][volPaths[0].length - 1] * 100).toFixed(1)}% (path 1)
+        </text>
       </svg>
     </div>
   )
@@ -46,140 +106,303 @@ function InteractiveViz() {
 export default function NeuralSDE() {
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Neural Stochastic Differential Equations</h2>
-      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">Neural SDEs replace the parametric drift and diffusion functions of classical stochastic models with neural networks, enabling data-driven learning of asset dynamics. For Indian markets, neural SDEs learn the true dynamics of Nifty prices -- including stochastic volatility, jumps, and regime-dependent behavior -- directly from observed data.</p>
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        Neural SDEs for Nifty Options Pricing
+      </h2>
+      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+        Neural Stochastic Differential Equations (Neural SDEs) replace the parametric
+        drift and diffusion functions in classical SDEs with neural networks. This
+        allows the model to learn complex, state-dependent dynamics directly from
+        Nifty options market data, capturing phenomena like the volatility smile,
+        term structure dynamics, and jump behavior that parametric models (Heston,
+        SABR) can only approximate.
+      </p>
 
-      <DefinitionBlock title="Neural Stochastic Differential Equation" label="Definition 13.14" definition="A Neural SDE parameterizes both the drift and diffusion functions of an Ito SDE using neural networks: dX_t = mu_theta(X_t, t)dt + sigma_phi(X_t, t)dW_t, where mu_theta and sigma_phi are learned from data. This generalizes classical models (GBM, Heston, etc.) by allowing arbitrary state-dependent dynamics." notation="dX_t = \mu_\theta(X_t, t)\,dt + \sigma_\phi(X_t, t)\,dW_t" />
+      <DefinitionBlock
+        title="Neural Stochastic Differential Equation"
+        label="Definition 13.11"
+        definition="A Neural SDE is a continuous-time stochastic model where the drift and diffusion coefficients are parameterized by neural networks. The asset price evolves as dS_t = mu_theta(t, S_t) dt + sigma_phi(t, S_t) dW_t, where mu_theta and sigma_phi are learned functions."
+        notation={<>The general form is <InlineMath math="dX_t = f_\theta(t, X_t)\,dt + g_\phi(t, X_t)\,dW_t" /> where <InlineMath math="f_\theta" /> and <InlineMath math="g_\phi" /> are neural networks with parameters <InlineMath math="\theta, \phi" />.</>}
+      />
 
-      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Classical SDEs as Special Cases</h3>
-      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">Neural SDEs subsume all classical financial models:</p>
-      <BlockMath math="\text{GBM: } \mu(S,t) = \mu S, \quad \sigma(S,t) = \sigma S" />
-      <BlockMath math="\text{Heston: } \mu(S,v,t) = \mu S, \quad \sigma(S,v,t) = \sqrt{v}\, S" />
-      <BlockMath math="\text{Neural SDE: } \mu(S,t) = \text{NN}_\theta(S,t), \quad \sigma(S,t) = \text{NN}_\phi(S,t)" />
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Neural SDE for Options Pricing
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For Nifty options pricing, we model the risk-neutral dynamics with a neural
+        diffusion:
+      </p>
 
-      <TheoremBlock title="Training via Adjoint Method" label="Theorem 13.14" statement="Neural SDEs can be trained efficiently using the continuous adjoint method, which computes gradients without storing intermediate states. The adjoint state a(t) = partial L / partial X_t evolves backward according to: da = -(partial mu/partial X)^T a dt - (partial sigma/partial X)^T a dW_t. Memory cost is O(1) regardless of the number of time steps." proof="By the chain rule through the SDE solver: dL/dtheta = integral_0^T a(t)^T (partial mu/partial theta) dt + a(t)^T (partial sigma/partial theta) dW_t. The adjoint a(t) satisfies a backward SDE that depends only on the current state, not the full forward trajectory. This reduces memory from O(NT) to O(N)." />
+      <BlockMath math="dS_t = r\, S_t\, dt + \sigma_\phi(t, S_t, v_t)\, S_t\, dW_t^S" />
+      <BlockMath math="dv_t = \kappa_\theta(t, v_t)(\bar{v}_\theta(t) - v_t)\,dt + \xi_\psi(t, v_t)\,dW_t^v" />
 
-      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Latent Neural SDEs</h3>
-      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">Latent neural SDEs model the unobserved state process driving asset prices:</p>
-      <BlockMath math="dZ_t = \mu_\theta(Z_t)\,dt + \sigma_\phi(Z_t)\,dW_t \quad \text{(latent dynamics)}" />
-      <BlockMath math="X_t = g_\psi(Z_t) \quad \text{(observation model)}" />
-      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">The latent state <InlineMath math="Z_t" /> captures unobserved market factors (investor sentiment, liquidity conditions) that drive Nifty dynamics.</p>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="r = 6.5\%" /> (RBI repo rate),{' '}
+        <InlineMath math="\sigma_\phi" /> is the neural local volatility, and{' '}
+        <InlineMath math="v_t" /> is a latent volatility factor. The model is
+        trained by minimizing the pricing error across the Nifty options surface:
+      </p>
 
-      <NoteBlock title="Neural SDEs for Indian Asset Pricing" type="tip">
-        <ul className="space-y-1 text-sm">
-          <li><strong>Nifty Dynamics:</strong> Learn state-dependent volatility that captures India VIX clustering</li>
-          <li><strong>Jump Modeling:</strong> Neural drift naturally captures jump-like behavior around events (RBI, Budget)</li>
-          <li><strong>Option Pricing:</strong> Neural SDE calibrated to Nifty option surface provides arbitrage-free pricing</li>
-          <li><strong>Multi-factor:</strong> Joint neural SDE for Nifty + Bank Nifty preserving correlation structure</li>
+      <BlockMath math="\mathcal{L}(\theta, \phi, \psi) = \sum_{K, T} \left(C_{\text{model}}(K, T; \theta, \phi, \psi) - C_{\text{market}}(K, T)\right)^2" />
+
+      <TheoremBlock
+        title="Universal Approximation for SDEs"
+        label="Theorem 13.8"
+        statement={<>A Neural SDE with sufficiently wide neural networks for drift <InlineMath math="f_\theta" /> and diffusion <InlineMath math="g_\phi" /> can approximate any Ito process with bounded coefficients to arbitrary accuracy:</>}
+        formula="\sup_{t \in [0,T]} \mathbb{E}\left[\|X_t - X_t^{\theta,\phi}\|^2\right] < \epsilon \quad \text{for any } \epsilon > 0"
+        proof={<>This follows from the universal approximation theorem for neural networks applied to the SDE coefficients. If the true drift and diffusion are continuous functions satisfying Lipschitz and linear growth conditions, then neural networks with ReLU activations can approximate them uniformly on compact sets. The SDE well-posedness theory (Ito existence theorem) then guarantees that the solution process inherits the approximation error. For Nifty options, this means the Neural SDE can fit any vol surface shape, including the steep put skew observed in Indian index options.</>}
+      />
+
+      <InteractiveNeuralSDE />
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Training with Adjoint Methods
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Neural SDEs are trained using the adjoint sensitivity method, which computes
+        gradients through the SDE solver without backpropagating through each
+        discretization step. The adjoint state <InlineMath math="a_t = \partial \mathcal{L} / \partial X_t" />{' '}
+        satisfies:
+      </p>
+
+      <BlockMath math="da_t = -a_t \frac{\partial f_\theta}{\partial X_t}\,dt - a_t \frac{\partial g_\phi}{\partial X_t}\,dW_t" />
+
+      <PythonCode
+        title="neural_sde_nifty.py"
+        runnable
+        code={`import numpy as np
+
+class NeuralSDESimulator:
+    """Simplified Neural SDE for Nifty options.
+
+    Demonstrates the concept with parametric neural-inspired
+    drift and diffusion. For full implementation, use torchsde.
+    """
+
+    def __init__(self, hidden_dim=32, seed=42):
+        self.rng = np.random.RandomState(seed)
+        self.hidden_dim = hidden_dim
+
+        # Simulated learned parameters (would be neural network weights)
+        self.W_drift = self.rng.randn(3, hidden_dim) * 0.1
+        self.b_drift = self.rng.randn(hidden_dim) * 0.01
+        self.W_drift_out = self.rng.randn(hidden_dim, 1) * 0.1
+
+        self.W_vol = self.rng.randn(3, hidden_dim) * 0.1
+        self.b_vol = self.rng.randn(hidden_dim) * 0.01
+        self.W_vol_out = self.rng.randn(hidden_dim, 1) * 0.1
+
+    def _relu(self, x):
+        return np.maximum(0, x)
+
+    def neural_drift(self, t, S, v):
+        """Learned drift function."""
+        x = np.array([t, np.log(S / 22000), v])
+        h = self._relu(x @ self.W_drift + self.b_drift)
+        mu = float(h @ self.W_vol_out) * 0.5
+        return 0.065 + mu * 0.1  # Around risk-free rate
+
+    def neural_diffusion(self, t, S, v):
+        """Learned diffusion function."""
+        x = np.array([t, np.log(S / 22000), v])
+        h = self._relu(x @ self.W_vol + self.b_vol)
+        sigma_raw = float(h @ self.W_vol_out)
+        return max(0.08, 0.16 + sigma_raw * 0.05)  # Floor at 8%
+
+    def simulate(self, S0, T, n_steps, n_paths):
+        """Simulate paths using Euler-Maruyama."""
+        dt = T / n_steps
+        S = np.zeros((n_paths, n_steps + 1))
+        vol = np.zeros((n_paths, n_steps + 1))
+        S[:, 0] = S0
+        vol[:, 0] = 0.16  # Initial vol
+
+        for t_idx in range(n_steps):
+            t = t_idx * dt
+            Z_S = self.rng.randn(n_paths)
+            Z_v = self.rng.randn(n_paths)
+
+            for i in range(n_paths):
+                mu = self.neural_drift(t, S[i, t_idx], vol[i, t_idx])
+                sigma = self.neural_diffusion(t, S[i, t_idx], vol[i, t_idx])
+
+                # Price dynamics
+                S[i, t_idx + 1] = S[i, t_idx] * np.exp(
+                    (mu - 0.5 * sigma**2) * dt +
+                    sigma * np.sqrt(dt) * Z_S[i]
+                )
+
+                # Vol dynamics (mean-reverting)
+                kappa = 2.0
+                vol_bar = 0.16
+                xi = 0.4
+                vol[i, t_idx + 1] = max(0.05,
+                    vol[i, t_idx] +
+                    kappa * (vol_bar - vol[i, t_idx]) * dt +
+                    xi * vol[i, t_idx] * np.sqrt(dt) * Z_v[i]
+                )
+
+        return S, vol
+
+    def price_option(self, S0, K, T, n_paths=10000, n_steps=100):
+        """Price option via Monte Carlo with Neural SDE."""
+        S, vol = self.simulate(S0, T, n_steps, n_paths)
+        payoff = np.maximum(S[:, -1] - K, 0)
+        price = np.exp(-0.065 * T) * np.mean(payoff)
+        std_err = np.exp(-0.065 * T) * np.std(payoff) / np.sqrt(n_paths)
+        return price, std_err
+
+# --- Demo ---
+nsde = NeuralSDESimulator(seed=42)
+
+print("=== Neural SDE for Nifty Options ===\\n")
+
+# Simulate paths
+S, vol = nsde.simulate(S0=22000, T=30/252, n_steps=30, n_paths=5)
+print("--- Sample Paths (30 days) ---")
+for i in range(5):
+    ret = (S[i, -1] / S[i, 0] - 1) * 100
+    final_vol = vol[i, -1] * 100
+    print(f"  Path {i+1}: {S[i,0]:.0f} -> {S[i,-1]:.0f} "
+          f"({ret:+.1f}%), vol={final_vol:.1f}%")
+
+# Price Nifty options across strikes
+print("\\n--- Nifty Option Prices (T=30 days) ---")
+strikes = [21500, 21750, 22000, 22250, 22500]
+for K in strikes:
+    price, se = nsde.price_option(22000, K, 30/252, n_paths=5000)
+    moneyness = (22000 - K) / 22000 * 100
+    print(f"  K={K} ({moneyness:+.1f}% ITM): "
+          f"Price={price:.1f} +/- {se:.1f} INR")
+
+# Compare with Black-Scholes
+print("\\n--- Neural SDE vs Parametric Models ---")
+print("Advantages:")
+print("  1. Learns vol surface shape from market data")
+print("  2. Captures state-dependent dynamics")
+print("  3. No need to specify functional form")
+print("  4. Naturally handles Nifty skew and smile")
+print("\\nCalibration target: Nifty weekly + monthly options")
+print("Training data: 2 years of NSE option chain snapshots")`}
+      />
+
+      <ExampleBlock
+        title="Calibrating Neural SDE to India VIX"
+        difficulty="advanced"
+        problem="India VIX trades at 14% with mean-reversion speed kappa = 3.0 and vol-of-vol xi = 0.6. A Neural SDE is trained on 2 years of daily India VIX data. What vol surface features can it capture that Heston cannot?"
+        solution={[
+          {
+            step: 'Heston limitations',
+            formula: '\\text{Heston: } dv_t = \\kappa(\\bar{v} - v_t)\\,dt + \\xi\\sqrt{v_t}\\,dW_t^v',
+            explanation: 'Heston constrains the vol-of-vol to be proportional to sqrt(v_t), producing a fixed functional form for the smile.',
+          },
+          {
+            step: 'Neural SDE flexibility',
+            formula: 'dv_t = f_\\theta(t, v_t)\\,dt + g_\\phi(t, v_t)\\,dW_t^v',
+            explanation: 'The Neural SDE can learn state-dependent mean-reversion and vol-of-vol, capturing features like vol-of-vol increasing during India VIX spikes (asymmetric behavior not possible in Heston).',
+          },
+          {
+            step: 'Practical improvements',
+            formula: '\\text{RMSE}_{\\text{Neural}} < \\text{RMSE}_{\\text{Heston}} \\text{ by 30-50\\%}',
+            explanation: 'The Neural SDE typically reduces option pricing RMSE by 30-50% on the Nifty vol surface, particularly for short-dated OTM puts where the steep skew is hardest to fit parametrically.',
+          },
+        ]}
+      />
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Neural SDE vs Parametric Models
+      </h3>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Model</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Parameters</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Smile Fit</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Nifty RMSE (bps)</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Black-Scholes</td>
+              <td className="px-4 py-2">1</td>
+              <td className="px-4 py-2">Flat (no smile)</td>
+              <td className="px-4 py-2">~150-300</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Heston</td>
+              <td className="px-4 py-2">5</td>
+              <td className="px-4 py-2">Moderate skew</td>
+              <td className="px-4 py-2">~50-100</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">SABR</td>
+              <td className="px-4 py-2">4</td>
+              <td className="px-4 py-2">Good short-dated</td>
+              <td className="px-4 py-2">~30-80</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Local Vol (Dupire)</td>
+              <td className="px-4 py-2">Surface</td>
+              <td className="px-4 py-2">Exact static fit</td>
+              <td className="px-4 py-2">~0 (by construction)</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Neural SDE</td>
+              <td className="px-4 py-2">~10K-100K</td>
+              <td className="px-4 py-2">Learned from data</td>
+              <td className="px-4 py-2">~10-30</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The key advantage of Neural SDEs over Dupire local volatility is that
+        they capture dynamic smile behavior -- how the volatility surface moves
+        over time -- rather than just fitting a static snapshot. This is crucial
+        for hedging multi-day Nifty option positions where vol surface dynamics
+        dominate P&L.
+      </p>
+
+      <NoteBlock title="Nifty Vol Surface Characteristics" type="historical">
+        <ul className="space-y-2">
+          <li>
+            <strong>Put Skew:</strong> Nifty options exhibit steep put skew, with
+            5% OTM puts trading at 3-5 vol points above ATM. Neural SDEs learn
+            this asymmetry naturally from market data.
+          </li>
+          <li>
+            <strong>Term Structure:</strong> The Nifty vol term structure is typically
+            in contango (upward sloping) but inverts during stress events. Neural
+            SDEs capture this state-dependent behaviour.
+          </li>
+          <li>
+            <strong>Expiry Effects:</strong> Weekly options expiry on Thursday creates
+            unique gamma dynamics. Neural SDEs trained on intraday data can learn
+            the characteristic vol crush pattern heading into expiry.
+          </li>
+          <li>
+            <strong>Correlation with India VIX:</strong> The neural diffusion function
+            naturally learns the correlation between Nifty returns and India VIX
+            movements, improving cross-Greek hedging accuracy.
+          </li>
         </ul>
       </NoteBlock>
 
-      <InteractiveViz />
-
-      <PythonCode title="neural_sde.py" runnable code={`import numpy as np
-
-class NeuralSDE:
-    """Neural SDE for learning Nifty price dynamics."""
-    def __init__(self, state_dim=1, hidden=16):
-        self.state_dim = state_dim
-        # Drift network
-        self.drift_W1 = np.random.randn(hidden, state_dim + 1) * 0.1
-        self.drift_W2 = np.random.randn(state_dim, hidden) * 0.1
-        # Diffusion network
-        self.diff_W1 = np.random.randn(hidden, state_dim + 1) * 0.1
-        self.diff_W2 = np.random.randn(state_dim, hidden) * 0.01
-
-    def drift(self, x, t):
-        inp = np.concatenate([x, [t]])
-        h = np.tanh(self.drift_W1 @ inp)
-        return self.drift_W2 @ h
-
-    def diffusion(self, x, t):
-        inp = np.concatenate([x, [t]])
-        h = np.tanh(self.diff_W1 @ inp)
-        return np.abs(self.diff_W2 @ h) + 0.01
-
-    def simulate(self, x0, T, n_steps, n_paths):
-        dt = T / n_steps
-        paths = np.zeros((n_paths, n_steps + 1, self.state_dim))
-        paths[:, 0] = x0
-
-        for p in range(n_paths):
-            x = x0.copy()
-            for t in range(n_steps):
-                t_val = t * dt / T
-                mu = self.drift(x, t_val)
-                sigma = self.diffusion(x, t_val)
-                dW = np.random.randn(self.state_dim) * np.sqrt(dt)
-                x = x + mu * dt + sigma * dW
-                paths[p, t + 1] = x
-
-        return paths
-
-class ClassicalGBM:
-    """GBM for comparison."""
-    def __init__(self, mu=0.12, sigma=0.18):
-        self.mu = mu; self.sigma = sigma
-
-    def simulate(self, S0, T, n_steps, n_paths):
-        dt = T / n_steps
-        paths = np.zeros((n_paths, n_steps + 1))
-        paths[:, 0] = S0
-        for p in range(n_paths):
-            for t in range(n_steps):
-                dW = np.random.randn() * np.sqrt(dt)
-                paths[p, t+1] = paths[p, t] * np.exp(
-                    (self.mu - 0.5*self.sigma**2)*dt + self.sigma*dW)
-        return paths
-
-# Compare Neural SDE vs GBM for Nifty
-np.random.seed(42)
-S0 = 20000
-T = 1.0  # 1 year
-n_steps = 252
-n_paths = 500
-
-# Neural SDE (log-price space)
-nsde = NeuralSDE(state_dim=1, hidden=16)
-log_paths = nsde.simulate(np.array([np.log(S0)]), T, n_steps, n_paths)
-nsde_prices = np.exp(log_paths[:, :, 0])
-
-# GBM
-gbm = ClassicalGBM(mu=0.12, sigma=0.18)
-gbm_prices = gbm.simulate(S0, T, n_steps, n_paths)
-
-print("=" * 60)
-print("  Neural SDE vs GBM - Nifty 50 Simulation")
-print("=" * 60)
-
-for name, prices in [('GBM', gbm_prices), ('Neural SDE', nsde_prices)]:
-    final = prices[:, -1]
-    returns = np.diff(np.log(prices), axis=1)
-
-    print(f"\\n{name}:")
-    print(f"  Final price range: [{np.min(final):,.0f}, {np.max(final):,.0f}]")
-    print(f"  Mean final:        {np.mean(final):,.0f}")
-    print(f"  Median final:      {np.median(final):,.0f}")
-    print(f"  Annual return:     {(np.mean(final)/S0 - 1)*100:+.1f}%")
-    print(f"  Daily vol:         {np.std(returns)*100:.2f}%")
-    print(f"  Annual vol:        {np.std(returns)*np.sqrt(252)*100:.1f}%")
-    print(f"  Skewness:          {np.mean(((returns.flatten()-returns.mean())/returns.std())**3):.3f}")
-    print(f"  Kurtosis:          {np.mean(((returns.flatten()-returns.mean())/returns.std())**4):.2f}")
-    print(f"  VaR(5%):           {np.percentile(final/S0 - 1, 5)*100:+.1f}%")
-
-print(f"\\nNeural SDE captures state-dependent dynamics that")
-print(f"GBM misses. After training on real Nifty data, Neural SDE")
-print(f"would produce realistic volatility clustering and jumps.")`} />
-
-      <ExampleBlock title="Neural SDE vs Heston for Nifty Options" difficulty="intermediate"
-        problem="Nifty 50 options show persistent volatility smile with steeper put skew. GBM cannot capture this. Compare how Heston and Neural SDE model the smile."
-        solution={[
-          { step: 'GBM limitation', formula: '\\sigma_{BS}(K) = \\text{constant} \\quad \\text{(flat smile)}', explanation: 'GBM produces flat implied volatility -- inconsistent with NSE Nifty option prices.' },
-          { step: 'Heston improvement', formula: 'dv_t = \\kappa(\\theta - v_t)dt + \\xi\\sqrt{v_t}dW_t^v', explanation: 'Heston with mean-reverting vol captures some skew through vol-of-vol parameter xi. But the functional form is fixed.' },
-          { step: 'Neural SDE advantage', formula: '\\sigma(S,v,t) = \\text{NN}_\\phi(S,v,t)', explanation: 'Neural SDE learns the exact form of state-dependent volatility from Nifty option prices. It can capture asymmetric skew, term structure effects, and regime-dependent behavior that no parametric model can match. Calibration is done by minimizing the distance between model-implied and market-observed option prices across strikes and maturities.' },
-        ]} />
-
-      <NoteBlock title="Key Takeaway" type="tip"><p>Neural SDEs represent the frontier of quantitative finance modeling, replacing rigid parametric assumptions with flexible neural networks that learn asset dynamics directly from data. For Indian markets, neural SDEs can capture the complex, state-dependent behavior of Nifty prices -- including volatility clustering, asymmetric jumps around events (RBI, elections), and regime-dependent correlations -- enabling more accurate option pricing, risk management, and scenario generation than any classical model.</p></NoteBlock>
+      <NoteBlock title="Key Takeaway" type="tip">
+        <p>
+          Neural SDEs combine the continuous-time framework of classical mathematical
+          finance with the flexibility of deep learning. For Nifty options, they offer a
+          way to build pricing and hedging models that automatically adapt to the
+          market-observed volatility dynamics without pre-specifying a parametric form.
+          The key implementation tools are <code>torchsde</code> for differentiable SDE
+          simulation and adjoint-based gradient computation. Always validate against
+          the live NSE option chain to ensure the model captures the steep put skew
+          characteristic of Indian index options.
+        </p>
+      </NoteBlock>
     </div>
   )
 }
