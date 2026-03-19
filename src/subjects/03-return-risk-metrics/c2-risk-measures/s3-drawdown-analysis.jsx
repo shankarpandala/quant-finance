@@ -323,14 +323,62 @@ for i, dd in enumerate(top_drawdowns):
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Drawdown-Based Position Sizing
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Drawdown limits can be used to dynamically size positions. The key idea is to
+        reduce exposure as drawdown deepens, preserving capital for recovery:
+      </p>
+
+      <BlockMath math="\text{Position Size} = \text{Base Size} \times \min\!\left(1, \frac{\text{Max Allowed DD} - \text{Current DD}}{\text{Max Allowed DD}}\right)" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For example, if the maximum allowed drawdown is 20% and the strategy is currently
+        in a 15% drawdown, position size is reduced to <InlineMath math="(20-15)/20 = 25\%" /> of
+        normal. This automatic de-risking mechanism prevents catastrophic losses but creates
+        a pro-cyclical effect -- reduced exposure means slower recovery. A compromise is
+        to use a floor (e.g., minimum 30% of base size) to maintain some exposure even
+        during deep drawdowns.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Conditional Drawdown at Risk (CDaR)
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Analogous to CVaR for returns, CDaR measures the average drawdown in the worst
+        <InlineMath math="(1-\alpha)" /> fraction of drawdown periods:
+      </p>
+
+      <BlockMath math="\text{CDaR}_\alpha = E[D_t \mid D_t > \text{DaR}_\alpha]" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="\text{DaR}_\alpha" /> is the drawdown-at-risk (the alpha
+        quantile of the drawdown distribution). CDaR can be used as an objective in
+        portfolio optimization to minimize tail drawdown risk. For Indian PMS schemes
+        with strict drawdown limits from investors, CDaR-constrained optimization ensures
+        the portfolio is designed to survive extreme market events.
+      </p>
+
+      <BlockMath math="\min_{\mathbf{w}} \; -\mathbf{w}^\top \boldsymbol{\mu} \quad \text{s.t. } \text{CDaR}_{95\%}(\mathbf{w}) \leq d_{\max}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        This optimization finds the highest-return portfolio subject to a maximum expected
+        tail drawdown. It is more conservative than variance-based optimization and
+        naturally accounts for the non-normal drawdown distributions observed in Indian
+        equity markets.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Drawdowns matter more than volatility to real investors. A strategy with 20% annual
           volatility might experience a 40-50% drawdown in a crisis (Nifty 50 in 2008). The{' '}
           <strong>Calmar ratio</strong> and <strong>Ulcer Index</strong> provide drawdown-adjusted
-          performance measures. For Indian quant strategies, always stress-test for historical
-          events: GFC 2008, COVID 2020, and FII selloffs. SEBI-registered PMS schemes must
-          disclose drawdown statistics, making this analysis mandatory for compliance.
+          performance measures. Use drawdown-based position sizing and CDaR-constrained
+          optimization for more robust portfolio construction. For Indian quant strategies,
+          always stress-test for historical events: GFC 2008, COVID 2020, and FII selloffs.
+          SEBI-registered PMS schemes must disclose drawdown statistics, making this analysis
+          mandatory for compliance.
         </p>
       </NoteBlock>
     </div>
