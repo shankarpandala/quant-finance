@@ -291,15 +291,94 @@ print(f"Residual: {residual*100:.6f}% (should be ~0)")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Multi-Period Attribution
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Single-period Brinson attribution does not aggregate correctly over multiple periods.
+        The compounding effect creates a residual that grows with the number of periods and
+        the magnitude of active returns. Two standard solutions are used in Indian fund
+        management:
+      </p>
+
+      <BlockMath math="\text{Geometric linking (Cariño method):} \quad A_t^{\text{linked}} = A_t \times \frac{\ln(1+R_p) / \ln(1+R_b)}{R_p / R_b}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The Cariño (1999) method adjusts single-period attribution effects so they sum
+        correctly to the multi-period geometric active return. The Menchero (2000) method
+        provides an alternative approach based on exact decomposition of compounded returns.
+        For SEBI-mandated quarterly and annual reporting, Indian PMS schemes typically use
+        the Cariño method.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Fixed-Income Attribution for Indian Debt Funds
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For Indian debt mutual funds (SEBI categories: overnight, liquid, short duration,
+        medium duration, long duration, dynamic bond), attribution uses a different
+        framework based on key rate duration contributions:
+      </p>
+
+      <BlockMath math="R_p - R_b = \underbrace{\Delta y \cdot (D_p - D_b)}_{\text{Duration}} + \underbrace{\Delta s \cdot (S_p - S_b)}_{\text{Credit}} + \underbrace{\text{Carry}_p - \text{Carry}_b}_{\text{Carry}} + \epsilon" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="D" /> is duration, <InlineMath math="\Delta y" /> is the
+        change in benchmark yield (10Y G-Sec), <InlineMath math="\Delta s" /> is the change
+        in credit spread, and <InlineMath math="S" /> is spread duration. This decomposition
+        is essential for understanding whether a debt fund's alpha comes from interest rate
+        timing, credit selection, or carry harvesting in the Indian bond market.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Attribution Type</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Asset Class</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Effects Decomposed</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">SEBI Use</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Brinson BHB</td>
+              <td className="px-4 py-2">Equity</td>
+              <td className="px-4 py-2">Allocation + Selection + Interaction</td>
+              <td className="px-4 py-2">PMS / MF reporting</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Factor Attribution</td>
+              <td className="px-4 py-2">Equity</td>
+              <td className="px-4 py-2">Factor exposures + Alpha</td>
+              <td className="px-4 py-2">Quant fund analysis</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Key Rate Duration</td>
+              <td className="px-4 py-2">Fixed Income</td>
+              <td className="px-4 py-2">Duration + Credit + Carry</td>
+              <td className="px-4 py-2">Debt fund evaluation</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Multi-Asset</td>
+              <td className="px-4 py-2">Balanced / Hybrid</td>
+              <td className="px-4 py-2">Asset allocation + Within-asset</td>
+              <td className="px-4 py-2">Hybrid fund reporting</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Brinson attribution reveals <em>where</em> and <em>how</em> active returns are
           generated. For Indian equity portfolios, sector allocation decisions (overweighting
           Banking or IT vs. Nifty 50 weights) and stock selection within sectors are the two
           primary sources of alpha. SEBI-registered funds use this framework for investor
-          reporting. In practice, most alpha in Indian large-cap funds comes from selection
+          reporting. For multi-period analysis, use the Cariño or Menchero linking methods.
+          In practice, most alpha in Indian large-cap funds comes from selection
           (picking better stocks) rather than allocation (sector bets), consistent with
-          global findings.
+          global findings. Extend to fixed-income attribution for debt fund analysis.
         </p>
       </NoteBlock>
     </div>

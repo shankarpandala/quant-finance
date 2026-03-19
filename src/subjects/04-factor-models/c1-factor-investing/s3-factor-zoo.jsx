@@ -291,6 +291,85 @@ print(f"The HLZ criterion (t>3.0) dramatically reduces false discoveries.")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Out-of-Sample Validation Framework
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The gold standard for validating factors is out-of-sample (OOS) testing. For
+        Indian equity data, the following framework is recommended:
+      </p>
+
+      <BlockMath math="\text{Split: Training (60\%)} \mid \text{Validation (20\%)} \mid \text{Test (20\%)}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For NSE with data from 2000-2024, a typical split might be: training on 2000-2014,
+        validation on 2015-2019, and final test on 2020-2024. The factor must show
+        significant IC in the validation period without any parameter tuning. Only then
+        is it evaluated on the test period for final performance assessment.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Validation Step</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Requirement</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Threshold</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">In-sample significance</td>
+              <td className="px-4 py-2">t-stat of IC</td>
+              <td className="px-4 py-2">&gt; 3.0 (HLZ)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">OOS IC retention</td>
+              <td className="px-4 py-2">OOS IC / IS IC ratio</td>
+              <td className="px-4 py-2">&gt; 50%</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Economic rationale</td>
+              <td className="px-4 py-2">Clear risk or behavioral story</td>
+              <td className="px-4 py-2">Must exist</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Cross-market validation</td>
+              <td className="px-4 py-2">Works on both NSE and BSE</td>
+              <td className="px-4 py-2">IC &gt; 0 on both</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Robustness to construction</td>
+              <td className="px-4 py-2">Stable under alternative definitions</td>
+              <td className="px-4 py-2">&gt; 70% of variants work</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Capacity check</td>
+              <td className="px-4 py-2">Works with realistic position sizes</td>
+              <td className="px-4 py-2">Survives impact cost adjustment</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Replication Crisis in Factor Research
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Hou, Xue, and Zhang (2020) attempted to replicate 452 published anomalies and
+        found that 65% failed to replicate at conventional significance levels. When
+        applying the HLZ multiple-testing correction, the failure rate rose to 82%. For
+        Indian markets specifically, the replication challenge is even greater due to:
+      </p>
+
+      <BlockMath math="\text{Indian challenges: } \begin{cases} \text{Shorter data history (post-2000 reliable)} \\ \text{Fewer stocks with quality data} \\ \text{Different market microstructure (T+1, STT)} \\ \text{Unique regulatory environment (SEBI)} \end{cases}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        This means factors discovered on US data should never be applied blindly to Indian
+        markets. Always re-validate on NSE/BSE data with proper Indian market adjustments
+        (risk-free rate, corporate actions, liquidity filters, SEBI regulation effects).
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           The factor zoo is a cautionary tale about data mining. Of 400+ published factors,
@@ -298,7 +377,9 @@ print(f"The HLZ criterion (t>3.0) dramatically reduces false discoveries.")`}
           the "big five" that survive rigorous testing: <strong>Market, Size, Value, Momentum,
           and Quality</strong>. Use the HLZ threshold (t &gt; 3.0) for any new factor claims
           and always demand out-of-sample validation, especially on Indian data which has a
-          shorter history than US markets.
+          shorter history than US markets. Apply the full validation framework: in-sample
+          significance, OOS retention, economic rationale, cross-market robustness, and
+          capacity testing before deploying any factor on NSE.
         </p>
       </NoteBlock>
     </div>

@@ -294,13 +294,86 @@ print(f"Parkinson efficiency:   ~5.2x vs close-to-close")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        India VIX: Implied Volatility
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        India VIX, computed by NSE from Nifty 50 option prices, measures the market's
+        expectation of 30-day forward volatility. Unlike historical volatility, it is
+        <strong> forward-looking</strong> and incorporates the collective expectations of
+        all market participants:
+      </p>
+
+      <BlockMath math="\text{India VIX}^2 = \frac{2}{T}\sum_i \frac{\Delta K_i}{K_i^2} e^{rT} Q(K_i) - \frac{1}{T}\left(\frac{F}{K_0} - 1\right)^2" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="Q(K_i)" /> is the mid-price of out-of-the-money options
+        at strike <InlineMath math="K_i" />, <InlineMath math="F" /> is the forward Nifty
+        price, and <InlineMath math="T" /> is the time to expiry. Key India VIX levels:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">India VIX Level</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Market Condition</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Daily Move Implied</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Strategy Implication</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">&lt; 12</td>
+              <td className="px-4 py-2">Extreme calm</td>
+              <td className="px-4 py-2">&lt; 0.75%</td>
+              <td className="px-4 py-2">Buy protection (cheap puts)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">12-18</td>
+              <td className="px-4 py-2">Normal</td>
+              <td className="px-4 py-2">0.75-1.1%</td>
+              <td className="px-4 py-2">Standard risk budgets</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">18-25</td>
+              <td className="px-4 py-2">Elevated anxiety</td>
+              <td className="px-4 py-2">1.1-1.6%</td>
+              <td className="px-4 py-2">Reduce position sizes</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">25-40</td>
+              <td className="px-4 py-2">Fear</td>
+              <td className="px-4 py-2">1.6-2.5%</td>
+              <td className="px-4 py-2">Defensive, hedged positions</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">&gt; 40</td>
+              <td className="px-4 py-2">Panic (COVID peak: 83)</td>
+              <td className="px-4 py-2">&gt; 2.5%</td>
+              <td className="px-4 py-2">Extreme caution; contrarian opportunity</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The volatility risk premium -- the difference between implied (India VIX) and
+        realized volatility -- averages about 3-5 percentage points on NSE. This premium
+        is harvested by systematic option-selling strategies on Bank Nifty and Nifty 50.
+      </p>
+
+      <BlockMath math="\text{VRP} = \text{India VIX} - \sigma_{\text{realized}} \approx 3\text{--}5\% \text{ on average}" />
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Use <strong>EWMA</strong> for dynamic risk management where recent volatility matters
           most (position sizing, margin calculations). Use <strong>Parkinson or Garman-Klass</strong>{' '}
           when OHLC data is available for more efficient estimates. For NSE stocks, the India VIX
           provides a market-implied forward-looking volatility for Nifty 50 options, complementing
-          historical estimates. Always match the volatility horizon to your trading horizon.
+          historical estimates. The volatility risk premium (India VIX minus realized vol) is a
+          tradeable signal for options strategies. Always match the volatility horizon to your
+          trading horizon and monitor India VIX levels for regime changes.
         </p>
       </NoteBlock>
     </div>
