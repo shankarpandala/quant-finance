@@ -367,6 +367,115 @@ for r in analyzer.perturbation_results[:10]:
         </ul>
       </NoteBlock>
 
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Advanced Analysis Framework
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        A comprehensive analysis framework for Indian markets must account for the unique
+        characteristics of NSE microstructure, SEBI regulations, and the interplay between
+        domestic and foreign institutional flows. The following performance attribution model
+        decomposes strategy returns into actionable components:
+      </p>
+
+      <BlockMath math="R_{\\text{strategy}} = \\alpha + \\beta_{\\text{Nifty}} R_{\\text{Nifty}} + \\beta_{\\text{FII}} F_{\\text{FII}} + \\sum_k \\gamma_k S_k + \\epsilon" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="F_{\\text{FII}}" /> captures the FII flow factor,{' '}
+        <InlineMath math="S_k" /> represents sector factors (Banking, IT, FMCG, Energy),
+        and <InlineMath math="\\alpha" /> measures the strategy genuine value-add. For
+        Indian markets, the FII flow factor alone explains 15-25% of cross-sectional return
+        variation in Nifty 50 stocks.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Performance Metric</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Target for NSE</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Measurement Period</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Annualized Alpha</td>
+              <td className="px-4 py-2">&gt; 5% above Nifty 50</td>
+              <td className="px-4 py-2">Rolling 12-month</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Information Ratio</td>
+              <td className="px-4 py-2">&gt; 0.5</td>
+              <td className="px-4 py-2">Since inception</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Maximum Drawdown</td>
+              <td className="px-4 py-2">&lt; 15% absolute</td>
+              <td className="px-4 py-2">Peak-to-trough</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Sortino Ratio</td>
+              <td className="px-4 py-2">&gt; 1.5</td>
+              <td className="px-4 py-2">Rolling 252-day</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Hit Rate</td>
+              <td className="px-4 py-2">&gt; 52% daily</td>
+              <td className="px-4 py-2">All trading days</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Tail Ratio</td>
+              <td className="px-4 py-2">&gt; 1.0</td>
+              <td className="px-4 py-2">95th/5th percentile</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Risk Management for NSE Deployment
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Deploying any quantitative strategy on NSE requires integration with a risk
+        management framework that accounts for Indian market specifics. The Expected
+        Shortfall at the 95% confidence level provides a more complete picture of tail risk
+        than VaR alone:
+      </p>
+
+      <BlockMath math="\\text{ES}_{0.95} = -\\mathbb{E}[R_p | R_p < \\text{VaR}_{0.95}]" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For strategies trading Nifty 50 stocks, the typical daily ES at 95% is 2-4% of
+        portfolio value. During extreme events (demonetization, COVID crash), ES can
+        spike to 8-12%. Circuit breakers on NSE provide some natural protection but
+        can also trap positions.
+      </p>
+
+      <NoteBlock title="Regulatory and Infrastructure Notes" type="historical">
+        <ul className="space-y-2">
+          <li>
+            <strong>SEBI Compliance:</strong> All algo strategies must be registered with
+            the exchange and comply with SEBI circular on automated trading. Maintain audit
+            trails for minimum 5 years.
+          </li>
+          <li>
+            <strong>Transaction Costs:</strong> Factor in STT (0.1% delivery, 0.025% intraday),
+            GST (18% on brokerage), stamp duty (0.015% buy side), and exchange transaction
+            charges. Zerodha offers zero delivery brokerage with INR 20/order for intraday.
+          </li>
+          <li>
+            <strong>Data Sources:</strong> Use Zerodha Kite Connect for real-time NSE data,
+            NSE archives for historical data, and Bloomberg/Refinitiv for comprehensive
+            fundamental data on Indian companies.
+          </li>
+          <li>
+            <strong>Deployment:</strong> AWS Mumbai (ap-south-1) provides 5-15ms latency
+            to NSE. Use Docker containers with TimescaleDB for tick data storage and
+            Grafana for real-time monitoring dashboards.
+          </li>
+        </ul>
+      </NoteBlock>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Strategy due diligence is a <strong>structured skepticism process</strong>. The
