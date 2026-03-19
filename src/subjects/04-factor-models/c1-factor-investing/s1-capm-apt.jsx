@@ -300,13 +300,81 @@ print("Oil sensitivity matters for Reliance; FX matters for TCS (USD revenues)."
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Testing CAPM on Indian Data
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Empirical tests of CAPM on NSE data reveal several well-known anomalies that
+        violate the model's predictions:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Anomaly</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">CAPM Prediction</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Indian Market Reality</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Implication</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Low Beta Anomaly</td>
+              <td className="px-4 py-2">High beta = high return</td>
+              <td className="px-4 py-2">Low beta outperforms on risk-adj basis</td>
+              <td className="px-4 py-2">Nifty 100 Low Vol outperforms</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Size Effect</td>
+              <td className="px-4 py-2">No size premium</td>
+              <td className="px-4 py-2">Small caps earn ~6% premium</td>
+              <td className="px-4 py-2">Nifty Smallcap outperforms long-term</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Value Effect</td>
+              <td className="px-4 py-2">No value premium</td>
+              <td className="px-4 py-2">High B/M earns ~4% premium</td>
+              <td className="px-4 py-2">PSU banks vs growth stocks</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Momentum Effect</td>
+              <td className="px-4 py-2">Past returns irrelevant</td>
+              <td className="px-4 py-2">Past winners continue (8-12% p.a.)</td>
+              <td className="px-4 py-2">Strongest anomaly on NSE</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The Fama-MacBeth (1973) two-pass regression test provides the standard empirical
+        framework. First, estimate betas for each stock using time-series regressions.
+        Second, regress cross-sectional returns on estimated betas each month. If CAPM
+        holds, the cross-sectional slope should equal the market premium and the intercept
+        should be zero. On NSE data, the SML is flatter than CAPM predicts (low-beta
+        stocks earn more than expected, high-beta stocks earn less), consistent with
+        the low-beta anomaly observed globally.
+      </p>
+
+      <BlockMath math="\text{Fama-MacBeth: } R_{i,t} = \gamma_{0,t} + \gamma_{1,t} \hat{\beta}_i + \epsilon_{i,t}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Under CAPM: <InlineMath math="\bar{\gamma}_0 = R_f" /> and{' '}
+        <InlineMath math="\bar{\gamma}_1 = \bar{R}_m - R_f" />. Indian data typically shows{' '}
+        <InlineMath math="\bar{\gamma}_0 > R_f" /> (intercept too high) and{' '}
+        <InlineMath math="\bar{\gamma}_1 < \bar{R}_m - R_f" /> (slope too flat), rejecting
+        CAPM as a complete model of expected returns on NSE.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           CAPM provides the simplest asset pricing framework: expected returns are linear in
           market beta. APT generalizes this to multiple factors (market, FX, oil, rates),
-          improving explanatory power from ~35% to ~60% for Indian stocks. Neither model is
-          perfect, but they establish the critical principle that <strong>expected returns
-          compensate for systematic risk exposure</strong>. Alpha is what remains unexplained --
+          improving explanatory power from ~35% to ~60% for Indian stocks. Empirical tests
+          on NSE data reject CAPM due to the low-beta anomaly, size effect, value premium,
+          and momentum effect. These anomalies motivate the move to multi-factor models.
+          Alpha is what remains unexplained after accounting for all systematic risk factors --
           the holy grail of quant finance on NSE.
         </p>
       </NoteBlock>

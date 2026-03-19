@@ -317,14 +317,95 @@ print(f"Front-loading ratio: {abs(trade_schedule[0]/trade_schedule[-1]):.2f}x")`
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Intraday Liquidity Patterns on NSE
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        NSE trading sessions exhibit a distinctive U-shaped volume pattern. Understanding
+        these intraday patterns is essential for optimal execution scheduling:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Time (IST)</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Volume Share</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Spread</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Strategy Implication</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">9:15-9:30</td>
+              <td className="px-4 py-2">~8% (opening)</td>
+              <td className="px-4 py-2">Wide</td>
+              <td className="px-4 py-2">Avoid unless liquidity taking</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">9:30-10:30</td>
+              <td className="px-4 py-2">~20%</td>
+              <td className="px-4 py-2">Tightening</td>
+              <td className="px-4 py-2">Good for initial execution</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">10:30-14:00</td>
+              <td className="px-4 py-2">~35%</td>
+              <td className="px-4 py-2">Tight</td>
+              <td className="px-4 py-2">Best for passive algorithms</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">14:00-15:00</td>
+              <td className="px-4 py-2">~22%</td>
+              <td className="px-4 py-2">Tightening</td>
+              <td className="px-4 py-2">Pick up remaining orders</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">15:00-15:30</td>
+              <td className="px-4 py-2">~15% (closing)</td>
+              <td className="px-4 py-2">Variable</td>
+              <td className="px-4 py-2">High impact; close auction available</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The opening 15 minutes and closing 30 minutes account for approximately 23% of
+        daily volume but with wider spreads and higher volatility. VWAP and TWAP
+        algorithms used by institutional traders on Zerodha or institutional platforms
+        should adapt their participation rates to match this intraday pattern.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Execution Algorithms for NSE
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Common execution algorithms used by institutional traders on NSE include:
+      </p>
+
+      <BlockMath math="\text{VWAP: } v_k = V_k^{\text{hist}} / \sum_j V_j^{\text{hist}} \quad \text{(trade proportional to historical volume profile)}" />
+      <BlockMath math="\text{TWAP: } v_k = Q / T \quad \text{(equal slices over time)}" />
+      <BlockMath math="\text{IS: minimize } E[\text{Cost}] + \lambda \cdot \text{Var}[\text{Cost}] \quad \text{(Almgren-Chriss)}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        VWAP is the most popular benchmark for Indian institutional execution. Implementation
+        Shortfall (IS) is preferred by sophisticated quant funds as it minimizes the total
+        cost of execution including timing risk. NSE also offers a closing price session
+        (3:40-4:00 PM) with a call auction mechanism, allowing traders to execute at the
+        official closing price without market impact.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Market impact is the dominant cost for institutional-size orders on NSE and BSE. The
           square-root law <InlineMath math="\Delta P \propto \sigma \sqrt{Q/V}" /> is remarkably
           universal across markets including India. The Almgren-Chriss framework provides the
           optimal execution schedule by balancing impact cost against timing risk. For Indian
-          markets, always account for SEBI circuit limits, T+1 settlement effects, and the
-          concentrated liquidity in the first and last hours of NSE trading.
+          markets, always account for SEBI circuit limits, T+1 settlement effects, the
+          U-shaped intraday volume pattern, and the concentrated liquidity in the first and
+          last hours of NSE trading. Use VWAP or IS algorithms matched to the specific
+          liquidity profile of your target stocks.
         </p>
       </NoteBlock>
     </div>

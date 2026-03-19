@@ -302,14 +302,94 @@ print(f"  Q5-Q1 spread: {q_returns.iloc[4] - q_returns.iloc[0]:+.2f}%")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Common Alpha Signal Categories for NSE
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Alpha signals for Indian equities fall into several broad categories, each with
+        distinct data requirements, decay profiles, and capacity:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Category</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Examples (NSE)</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Data Source</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Typical IC</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Decay</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Price-based</td>
+              <td className="px-4 py-2">Momentum, reversal, vol</td>
+              <td className="px-4 py-2">NSE prices</td>
+              <td className="px-4 py-2">0.03-0.07</td>
+              <td className="px-4 py-2">Fast (5-30d)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Fundamental</td>
+              <td className="px-4 py-2">P/E, ROE, D/E, cash flow</td>
+              <td className="px-4 py-2">CMIE, annual reports</td>
+              <td className="px-4 py-2">0.03-0.05</td>
+              <td className="px-4 py-2">Slow (60-120d)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Analyst</td>
+              <td className="px-4 py-2">Earnings revisions, target px</td>
+              <td className="px-4 py-2">Bloomberg, broker reports</td>
+              <td className="px-4 py-2">0.04-0.06</td>
+              <td className="px-4 py-2">Medium (15-30d)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Ownership</td>
+              <td className="px-4 py-2">Promoter, FII, MF changes</td>
+              <td className="px-4 py-2">SEBI filings</td>
+              <td className="px-4 py-2">0.02-0.05</td>
+              <td className="px-4 py-2">Slow (30-90d)</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Event-driven</td>
+              <td className="px-4 py-2">Earnings surprise, buyback</td>
+              <td className="px-4 py-2">BSE announcements</td>
+              <td className="px-4 py-2">0.05-0.10</td>
+              <td className="px-4 py-2">Fast (1-10d)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Rank vs. Z-Score Normalization
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Two common normalization approaches are used in practice. Z-scoring preserves
+        the relative magnitude of signals but is sensitive to outliers. Rank normalization
+        (converting to uniform percentiles) is robust to outliers but discards magnitude:
+      </p>
+
+      <BlockMath math="\text{Rank}_i = \frac{\text{rank}(x_i)}{N+1}, \quad z_i^{\text{rank}} = \Phi^{-1}(\text{Rank}_i)" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For Indian mid and small-cap stocks where outliers are common (circuit hits,
+        illiquid price jumps), rank normalization is generally preferred. For Nifty 50
+        large-cap stocks with clean data, z-scoring preserves more information. Many
+        practitioners use a hybrid: rank-normalize first, then convert to normal scores
+        using the inverse CDF (rank-based z-scoring), getting the best of both approaches.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Signal design is the most important step in quant investing. A well-processed signal
-          (winsorized, z-scored, sector-neutralized) dramatically improves IC and portfolio
-          performance on NSE. Always process signals cross-sectionally (across stocks) rather
-          than time-series. Sector neutralization prevents unintended sector bets, and
-          winsorization reduces the influence of circuit-hit stocks. Combine multiple
-          low-correlation signals for diversification benefits.
+          (winsorized, z-scored or rank-normalized, sector-neutralized) dramatically improves
+          IC and portfolio performance on NSE. Always process signals cross-sectionally
+          (across stocks) rather than time-series. Sector neutralization prevents unintended
+          sector bets, and winsorization reduces the influence of circuit-hit stocks. Use
+          rank normalization for mid/small-cap universes and z-scoring for large-cap. Combine
+          multiple low-correlation signals from different categories (price, fundamental,
+          ownership) for maximum diversification.
         </p>
       </NoteBlock>
     </div>

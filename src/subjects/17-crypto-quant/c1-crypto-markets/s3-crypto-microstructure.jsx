@@ -269,6 +269,105 @@ if arbs:
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Liquidity Fragmentation Metrics
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Unlike NSE where liquidity concentrates in a single CLOB, crypto liquidity is
+        distributed across dozens of exchanges. The Herfindahl-Hirschman Index (HHI)
+        measures liquidity concentration:
+      </p>
+
+      <BlockMath math="\text{HHI} = \sum_{i=1}^{N} s_i^2, \quad s_i = \frac{V_i}{\sum_j V_j}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For BTC/USDT, HHI is approximately 0.25 (Binance-dominated), while for
+        smaller altcoins HHI can be as low as 0.05, indicating extreme fragmentation.
+        The effective spread for a fragmented market is:
+      </p>
+
+      <BlockMath math="\text{Effective Spread}_{\text{global}} = \frac{\sum_i V_i \cdot s_i^{\text{eff}}}{\sum_i V_i} + \text{Cross-exchange transfer cost}" />
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Feature</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Crypto (CEX)</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">NSE Equity</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Crypto (DEX)</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Trading Hours</td>
+              <td className="px-4 py-2">24/7/365</td>
+              <td className="px-4 py-2">9:15--15:30 IST</td>
+              <td className="px-4 py-2">24/7/365</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Order Book</td>
+              <td className="px-4 py-2">CLOB</td>
+              <td className="px-4 py-2">CLOB</td>
+              <td className="px-4 py-2">AMM</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Typical Spread</td>
+              <td className="px-4 py-2">1--5 bps</td>
+              <td className="px-4 py-2">2--10 bps</td>
+              <td className="px-4 py-2">30 bps (fee)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Settlement</td>
+              <td className="px-4 py-2">Instant (internal)</td>
+              <td className="px-4 py-2">T+1</td>
+              <td className="px-4 py-2">~12s (Ethereum)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Leverage Available</td>
+              <td className="px-4 py-2">Up to 125x</td>
+              <td className="px-4 py-2">Up to 5x (F&O)</td>
+              <td className="px-4 py-2">1x (spot only)</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Regulation</td>
+              <td className="px-4 py-2">Varies by jurisdiction</td>
+              <td className="px-4 py-2">SEBI regulated</td>
+              <td className="px-4 py-2">Permissionless</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        24/7 Market Dynamics
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The continuous nature of crypto trading creates unique microstructure patterns.
+        Volatility and volume exhibit time-of-day effects driven by global market openings:
+      </p>
+
+      <BlockMath math="\sigma_{\text{hourly}}(h) = \sigma_{\text{base}} \cdot \left(1 + \sum_{k \in \text{sessions}} a_k \cdot e^{-\frac{(h - h_k)^2}{2w_k^2}}\right)" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="h_k" /> are the opening hours of major sessions:
+        Asia (1:30 UTC, IST market open), Europe (7:00 UTC), and US (13:30 UTC).
+        The US session typically accounts for 40--50% of daily BTC volume, with the
+        India/Asia session contributing 20--25%.
+      </p>
+
+      <NoteBlock title="Weekend Effect in Crypto" type="historical">
+        <p>
+          Despite trading 24/7, crypto markets exhibit a "weekend effect" where
+          volatility increases and liquidity decreases on weekends. Average weekend
+          spreads on BTC/USDT are 30--50% wider than weekday spreads on Binance.
+          This creates opportunities for market-making strategies that widen quotes
+          on weekends while maintaining tighter spreads during high-liquidity weekday
+          periods. Indian traders should note that weekend volatility spikes often
+          occur during US evening hours (IST early morning Sunday).
+        </p>
+      </NoteBlock>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Crypto microstructure is characterized by perpetual futures funding rates,

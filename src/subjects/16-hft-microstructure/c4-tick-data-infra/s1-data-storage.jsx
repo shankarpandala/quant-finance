@@ -372,6 +372,69 @@ print(f"  Yearly Parq: {nse_daily_gb * 0.12 * 252 / 1024:.2f} TB")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Further Reading and Resources
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For deeper exploration of the concepts covered in this section, consider
+        the following resources and research directions. The intersection of
+        quantitative methods with Indian market specifics offers rich opportunities
+        for both academic research and practical strategy development.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Resource</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Type</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Relevance</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">NSE Research Papers</td>
+              <td className="px-4 py-2">Academic</td>
+              <td className="px-4 py-2">Indian market empirics</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">SEBI Discussion Papers</td>
+              <td className="px-4 py-2">Regulatory</td>
+              <td className="px-4 py-2">Market structure rules</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">RBI Working Papers</td>
+              <td className="px-4 py-2">Policy</td>
+              <td className="px-4 py-2">Macro-financial linkages</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">CMIE ProwessIQ</td>
+              <td className="px-4 py-2">Data</td>
+              <td className="px-4 py-2">Indian corporate financials</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">IIM/ISB Research</td>
+              <td className="px-4 py-2">Academic</td>
+              <td className="px-4 py-2">Indian finance research</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <NoteBlock title="Implementation Notes" type="historical">
+        <p>
+          When implementing these concepts for Indian markets, remember to account for
+          the T+1 settlement cycle (since January 2023), the pre-open auction session
+          mechanics (9:00--9:15 AM IST), and SEBI's regulatory requirements for
+          algorithmic trading including the mandatory algo order tagging and
+          order-to-trade ratio limits. Testing strategies on historical NSE data
+          should use adjusted prices that account for corporate actions (splits,
+          bonuses, dividends) which are frequent among Indian listed companies.
+        </p>
+      </NoteBlock>
+
+
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Efficient tick data infrastructure is the foundation of quantitative trading

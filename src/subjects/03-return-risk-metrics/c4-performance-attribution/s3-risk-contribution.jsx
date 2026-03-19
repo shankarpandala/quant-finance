@@ -311,14 +311,105 @@ print(f"\\nRisk parity reduces Banking overweight and increases FMCG allocation.
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Implementing Risk Budgets in Practice
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Risk budgeting sets target risk contributions for each position or sector. The
+        optimization problem finds weights such that each position's risk contribution
+        matches the budget:
+      </p>
+
+      <BlockMath math="\min_{\mathbf{w}} \sum_{i=1}^{N} \left(\frac{w_i (\Sigma \mathbf{w})_i}{\mathbf{w}^\top \Sigma \mathbf{w}} - b_i\right)^2 \quad \text{s.t. } \sum_i w_i = 1, \; w_i \geq 0" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="b_i" /> is the target risk budget for position{' '}
+        <InlineMath math="i" /> (with <InlineMath math="\sum b_i = 1" />). For a risk
+        parity portfolio, <InlineMath math="b_i = 1/N" /> for all positions. Custom risk
+        budgets allow overweighting higher-conviction positions while maintaining
+        diversification.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Conditional Risk Contribution
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Standard risk contribution assumes a normal distribution. For Indian markets
+        with fat tails, conditional risk contribution based on CVaR provides a more
+        accurate tail-risk decomposition:
+      </p>
+
+      <BlockMath math="\text{CRC}_i^{\text{CVaR}} = w_i \cdot E[R_i \mid R_p < \text{VaR}_\alpha(R_p)]" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        This measures each position's contribution to portfolio losses during tail events.
+        For Indian portfolios, Banking stocks contribute even more to CVaR-based risk
+        (60-70%) than to volatility-based risk (40-60%) due to their left-tail
+        skewness during market crashes. Computing CVaR risk contributions typically
+        requires Monte Carlo simulation or historical bootstrap methods.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">NSE Sector</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Weight</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Vol Risk %</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">CVaR Risk %</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Difference</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Banking</td>
+              <td className="px-4 py-2">35%</td>
+              <td className="px-4 py-2">50%</td>
+              <td className="px-4 py-2">62%</td>
+              <td className="px-4 py-2 text-red-600">+12%</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">IT</td>
+              <td className="px-4 py-2">20%</td>
+              <td className="px-4 py-2">22%</td>
+              <td className="px-4 py-2">18%</td>
+              <td className="px-4 py-2 text-green-600">-4%</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">FMCG</td>
+              <td className="px-4 py-2">15%</td>
+              <td className="px-4 py-2">10%</td>
+              <td className="px-4 py-2">7%</td>
+              <td className="px-4 py-2 text-green-600">-3%</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Pharma</td>
+              <td className="px-4 py-2">15%</td>
+              <td className="px-4 py-2">8%</td>
+              <td className="px-4 py-2">5%</td>
+              <td className="px-4 py-2 text-green-600">-3%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        This table shows that Banking's share of tail risk (62%) far exceeds its weight
+        (35%) and even its volatility risk contribution (50%). Defensive sectors like FMCG
+        and Pharma contribute less to tail risk than to volatility risk, making them
+        effective portfolio hedges during Indian market crises.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Risk contribution analysis reveals hidden concentrations that weight-based analysis
           misses. In typical Indian portfolios, Banking stocks contribute 40-60% of total risk
-          due to their high volatility and correlation. Risk parity rebalances toward
-          lower-volatility sectors (FMCG, Pharma), reducing overall portfolio risk. For
-          SEBI-regulated portfolios, risk budgeting ensures that no single sector or factor
-          dominates -- a crucial practice for risk management in Indian markets.
+          due to their high volatility and correlation -- and even more (60-70%) to tail risk.
+          Risk parity rebalances toward lower-volatility sectors (FMCG, Pharma), reducing
+          overall portfolio risk. Use CVaR-based risk decomposition for more accurate tail
+          risk attribution. For SEBI-regulated portfolios, risk budgeting ensures that no
+          single sector or factor dominates -- a crucial practice for risk management in
+          Indian markets.
         </p>
       </NoteBlock>
     </div>

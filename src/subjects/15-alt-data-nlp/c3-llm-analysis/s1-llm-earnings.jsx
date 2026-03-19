@@ -299,6 +299,84 @@ for k, v in trade.items():
         </p>
       </NoteBlock>
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Management Tone Analysis
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Beyond structured metric extraction, LLMs excel at capturing qualitative
+        shifts in management tone during earnings calls. The tone signal measures
+        the change in sentiment between the prepared remarks and the Q&A section:
+      </p>
+
+      <BlockMath math="\text{Tone Shift} = s_{\text{Q\&A}} - s_{\text{prepared}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        A negative tone shift (management becomes more cautious when answering analyst
+        questions) is predictive of future earnings misses. For Indian companies,
+        tone analysis must account for the cultural tendency toward indirect
+        communication and the bilingual nature of many earnings calls.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Tone Feature</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Measurement</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Predictive Power</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Horizon</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Overall Sentiment</td>
+              <td className="px-4 py-2">LLM classification</td>
+              <td className="px-4 py-2">IC = 0.05</td>
+              <td className="px-4 py-2">60 days</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Tone Shift (Q&A vs Prepared)</td>
+              <td className="px-4 py-2">Section comparison</td>
+              <td className="px-4 py-2">IC = 0.08</td>
+              <td className="px-4 py-2">90 days</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Guidance Language</td>
+              <td className="px-4 py-2">Hedging word count</td>
+              <td className="px-4 py-2">IC = 0.06</td>
+              <td className="px-4 py-2">Next quarter</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Analyst Pushback</td>
+              <td className="px-4 py-2">Question aggressiveness</td>
+              <td className="px-4 py-2">IC = 0.04</td>
+              <td className="px-4 py-2">30 days</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Number Specificity</td>
+              <td className="px-4 py-2">Quantitative guidance ratio</td>
+              <td className="px-4 py-2">IC = 0.07</td>
+              <td className="px-4 py-2">60 days</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <BlockMath math="\text{Composite Earnings Signal} = \alpha \cdot S_{\text{surprise}} + \beta \cdot S_{\text{tone}} + \gamma \cdot S_{\text{guidance}}" />
+
+      <NoteBlock title="Hallucination Risk in Financial LLMs" type="warning">
+        <p>
+          LLMs can hallucinate financial figures, especially for smaller Indian
+          companies with limited training data coverage. Critical safeguards include:
+          (1) always cross-reference extracted numbers against the source filing using
+          regex validation, (2) flag results where LLM confidence is below threshold,
+          (3) use structured output formats (JSON) with schema validation, and (4)
+          implement a human-in-the-loop review for high-value trading signals. Never
+          trade solely on LLM-extracted data without verification against the original
+          BSE/NSE filing.
+        </p>
+      </NoteBlock>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           LLMs enable scalable earnings analysis across thousands of Indian companies,

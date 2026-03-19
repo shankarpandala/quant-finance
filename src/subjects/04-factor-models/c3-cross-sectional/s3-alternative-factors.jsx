@@ -300,15 +300,94 @@ print(f"providing diversification when added to a multi-factor model on NSE.")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        ESG Factors in Indian Markets
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Environmental, Social, and Governance (ESG) factors are gaining traction in India
+        as SEBI mandates Business Responsibility and Sustainability Reporting (BRSR) for
+        the top 1000 listed companies. ESG scores can be constructed from:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">ESG Pillar</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Indian Data Source</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Metric Example</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Factor IC (est.)</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Environmental</td>
+              <td className="px-4 py-2">BRSR disclosure</td>
+              <td className="px-4 py-2">Carbon intensity, water usage</td>
+              <td className="px-4 py-2">0.01-0.02</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Social</td>
+              <td className="px-4 py-2">CSR spend, employee metrics</td>
+              <td className="px-4 py-2">CSR as % of profit, attrition</td>
+              <td className="px-4 py-2">0.01-0.02</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Governance</td>
+              <td className="px-4 py-2">Board composition, related parties</td>
+              <td className="px-4 py-2">Independent directors %, RPT ratio</td>
+              <td className="px-4 py-2">0.02-0.04</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Combined ESG</td>
+              <td className="px-4 py-2">NSE ESG indices, CRISIL ESG</td>
+              <td className="px-4 py-2">Composite score</td>
+              <td className="px-4 py-2">0.02-0.03</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        On Indian data, the governance pillar has shown the strongest alpha, consistent
+        with the importance of promoter quality and related-party transaction risk in
+        Indian corporate structures. NSE launched the Nifty 100 ESG index, and several
+        ESG-themed mutual funds are now available. However, ESG data quality in India
+        remains a challenge -- BRSR is still evolving, and third-party ESG scores often
+        disagree significantly across providers (CRISIL, Sustainalytics, MSCI).
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Sentiment and News-Based Factors
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Alternative data from news, social media, and corporate filings can generate
+        alpha signals for Indian stocks:
+      </p>
+
+      <BlockMath math="\text{Sentiment}_{i,t} = \frac{N^+_{i,t} - N^-_{i,t}}{N^+_{i,t} + N^-_{i,t}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="N^+" /> and <InlineMath math="N^-" /> are the counts of
+        positive and negative news articles for stock <InlineMath math="i" /> in period{' '}
+        <InlineMath math="t" />. Sources include Hindi and English financial news (MoneyControl,
+        Economic Times, LiveMint), BSE/NSE corporate announcements, and SEBI order database
+        (for regulatory actions). NLP-based sentiment analysis on Indian financial text
+        requires models trained on Indian English and Hinglish content, as standard
+        English sentiment dictionaries miss India-specific financial terminology.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           India offers unique alternative factors not available in most global markets.
-          <strong>Promoter holding changes</strong> and <strong>pledge ratios</strong> from
+          <strong> Promoter holding changes</strong> and <strong>pledge ratios</strong> from
           SEBI's mandatory quarterly disclosures are particularly powerful, with low correlation
           to standard factors. <strong>FII flow data</strong> from NSDL/CDSL captures the
-          information content of foreign institutional activity. These India-specific signals
-          provide genuine diversification when added to a Fama-French-style factor model.
-          Always lag ownership data by the publication delay (typically 21 days after quarter-end).
+          information content of foreign institutional activity. Emerging sources include
+          ESG factors (governance is strongest), news sentiment, and satellite/alternative data.
+          These India-specific signals provide genuine diversification when added to a
+          Fama-French-style factor model. Always lag ownership data by the publication delay
+          (typically 21 days after quarter-end).
         </p>
       </NoteBlock>
     </div>

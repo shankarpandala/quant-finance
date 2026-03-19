@@ -269,6 +269,80 @@ for regime_name, mean_f, vol_f in regimes:
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Risk Management Framework
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The key risks in funding rate arbitrage require systematic monitoring and
+        mitigation:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Risk</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Description</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Mitigation</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Impact</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Basis Risk</td>
+              <td className="px-4 py-2">Spot-perp spread widens</td>
+              <td className="px-4 py-2">Maintain margin buffer</td>
+              <td className="px-4 py-2">Medium</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Negative Funding</td>
+              <td className="px-4 py-2">Funding flips to shorts paying longs</td>
+              <td className="px-4 py-2">Exit when funding goes negative</td>
+              <td className="px-4 py-2">Medium</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Liquidation</td>
+              <td className="px-4 py-2">Margin call on perp leg</td>
+              <td className="px-4 py-2">Low leverage, auto-deleverage alerts</td>
+              <td className="px-4 py-2">High</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Exchange Risk</td>
+              <td className="px-4 py-2">Exchange insolvency/hack</td>
+              <td className="px-4 py-2">Multi-exchange, limit per venue</td>
+              <td className="px-4 py-2">Catastrophic</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Stablecoin Depeg</td>
+              <td className="px-4 py-2">USDT/USDC deviates from $1</td>
+              <td className="px-4 py-2">Monitor peg, diversify stables</td>
+              <td className="px-4 py-2">High</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <BlockMath math="\text{Max Position} = \frac{\text{Capital}}{1 + \text{Max Basis Widening} + \text{Margin Buffer}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The margin buffer should account for the maximum expected basis widening
+        during volatile periods. During the March 2020 crash, BTC perp basis widened
+        to -30% annualized, while during the 2021 bull run it reached +100% annualized.
+        A prudent margin buffer of 20--30% of position value is recommended.
+      </p>
+
+      <NoteBlock title="Indian Tax Considerations" type="warning">
+        <p>
+          For Indian residents executing funding rate arbitrage on global exchanges,
+          the gains are taxable as income from Virtual Digital Assets under Section
+          115BBH at 30% flat rate (plus applicable surcharge and cess). The 1% TDS
+          under Section 194S applies only to Indian exchanges, making global exchanges
+          more practical for this strategy. However, all foreign crypto income must
+          be declared in ITR, and FEMA considerations apply for remitting capital
+          abroad. Consult a qualified chartered accountant for compliance.
+        </p>
+      </NoteBlock>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Funding rate arbitrage is one of the most accessible crypto quant strategies,

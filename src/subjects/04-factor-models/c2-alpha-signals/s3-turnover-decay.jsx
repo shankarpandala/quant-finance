@@ -297,14 +297,100 @@ for freq in rebal_frequencies:
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Turnover Reduction Techniques
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Several techniques reduce turnover without significantly sacrificing alpha:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Technique</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Mechanism</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">TO Reduction</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Alpha Impact</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Buffer bands</td>
+              <td className="px-4 py-2">Only trade when signal changes by &gt; threshold</td>
+              <td className="px-4 py-2">30-50%</td>
+              <td className="px-4 py-2">Minimal (5-10% IC loss)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Signal smoothing</td>
+              <td className="px-4 py-2">EWMA of signal over time</td>
+              <td className="px-4 py-2">20-40%</td>
+              <td className="px-4 py-2">Small (delays signal)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Partial rebalancing</td>
+              <td className="px-4 py-2">Trade only fraction of target change</td>
+              <td className="px-4 py-2">50-70%</td>
+              <td className="px-4 py-2">Moderate (slower convergence)</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">TC penalty in optimizer</td>
+              <td className="px-4 py-2">Add turnover cost to objective</td>
+              <td className="px-4 py-2">30-50%</td>
+              <td className="px-4 py-2">Optimal (net-alpha aware)</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Staggered rebalancing</td>
+              <td className="px-4 py-2">Rebalance 1/N of portfolio each period</td>
+              <td className="px-4 py-2">N-fold reduction</td>
+              <td className="px-4 py-2">Smoother execution</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Buffer bands are particularly effective for NSE strategies. Instead of rebalancing
+        whenever the target weight changes, only trade when the current weight deviates
+        from the target by more than a threshold:
+      </p>
+
+      <BlockMath math="\text{Trade if } |w_i^{\text{actual}} - w_i^{\text{target}}| > \delta, \quad \delta \approx \sqrt{\frac{2c}{h \cdot \text{IC}^2}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="c" /> is the one-way cost and <InlineMath math="h" /> is
+        the holding period in days. For NSE delivery trades with 46 bps one-way cost and
+        a 21-day momentum signal, the optimal buffer is approximately 2-3% weight deviation.
+        This simple rule typically reduces turnover by 30-40% while preserving 90-95% of
+        gross alpha.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Breakeven IC Analysis
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The breakeven IC is the minimum signal strength needed to cover transaction costs:
+      </p>
+
+      <BlockMath math="\text{IC}_{\text{breakeven}} = \frac{c \times \text{TO}_{\text{annual}}}{\sigma_{\text{active}} \times \sqrt{N \times f}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For a typical NSE strategy with 46 bps round-trip costs, 300% annual turnover,
+        500 stocks, and monthly rebalancing, the breakeven IC is approximately 0.025-0.030.
+        Any signal with IC below this threshold will lose money after costs, regardless of
+        its statistical significance.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Alpha decay and transaction costs are locked in a fundamental tension. For Indian
           markets with high STT and impact costs, the optimal rebalancing frequency is
-          typically <strong>weekly to monthly</strong> for most equity signals. Intraday signals
-          require extremely high IC to overcome NSE's cost structure. Always compute the
-          "breakeven IC" -- the minimum IC needed for the signal to be profitable after all
-          costs. For delivery-based NSE strategies, this is typically IC &gt; 0.03.
+          typically <strong>weekly to monthly</strong> for most equity signals. Use buffer
+          bands and TC-aware optimization to reduce turnover by 30-50% while preserving most
+          alpha. Always compute the <strong>breakeven IC</strong> -- the minimum IC needed for
+          the signal to be profitable after all costs. For delivery-based NSE strategies,
+          this is typically IC &gt; 0.025-0.030. Intraday signals require even higher IC to
+          overcome NSE's cost structure.
         </p>
       </NoteBlock>
     </div>

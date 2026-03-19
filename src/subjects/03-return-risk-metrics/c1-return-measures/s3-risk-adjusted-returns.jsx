@@ -298,13 +298,99 @@ print("due to fat left tail -- a common trap in Indian options markets.")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Statistical Significance of the Sharpe Ratio
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        A common mistake is treating the Sharpe ratio as precise. The estimated Sharpe ratio
+        has a standard error that depends on the sample size:
+      </p>
+
+      <BlockMath math="\text{SE}(\hat{S}) \approx \sqrt{\frac{1 + S^2/2}{N}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="N" /> is the number of observations (months or years). For a
+        strategy with a true Sharpe of 1.0 measured over 3 years of monthly data (N=36),
+        the standard error is approximately <InlineMath math="\sqrt{1.5/36} = 0.20" />. This
+        means the 95% confidence interval is [0.61, 1.39] -- a wide range! Indian quant
+        strategies with short track records (common for PMS schemes) have very imprecise
+        Sharpe estimates.
+      </p>
+
+      <BlockMath math="\text{Min track record for } 95\% \text{ confidence:} \quad N \geq \left(\frac{1.96}{\hat{S}}\right)^2 \times (1 + \hat{S}^2/2)" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For a Sharpe of 0.5, you need approximately 62 monthly observations (~5 years) for
+        statistical significance. For a Sharpe of 1.0, you need approximately 17 months.
+        This is why SEBI mandates minimum 3-year track records for PMS performance claims.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Omega Ratio: Beyond Mean-Variance
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        The Omega ratio considers the entire return distribution, not just mean and variance:
+      </p>
+
+      <BlockMath math="\Omega(\theta) = \frac{\int_\theta^\infty [1 - F(r)] \, dr}{\int_{-\infty}^\theta F(r) \, dr} = \frac{E[\max(R-\theta, 0)]}{E[\max(\theta-R, 0)]}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="\theta" /> is the threshold return (typically 0 or{' '}
+        <InlineMath math="R_f" />). The Omega ratio captures the full distribution shape,
+        making it particularly useful for strategies with non-normal returns (common in
+        Indian options strategies). An Omega ratio above 1.5 at the risk-free threshold
+        indicates a strong strategy after accounting for all moments.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Metric</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Handles Non-Normality</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Handles Drawdowns</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Best For</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Sharpe</td>
+              <td className="px-4 py-2">No (assumes normal)</td>
+              <td className="px-4 py-2">No</td>
+              <td className="px-4 py-2">General comparison</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Sortino</td>
+              <td className="px-4 py-2">Partially (downside)</td>
+              <td className="px-4 py-2">No</td>
+              <td className="px-4 py-2">Asymmetric strategies</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Omega</td>
+              <td className="px-4 py-2">Yes (full distribution)</td>
+              <td className="px-4 py-2">No</td>
+              <td className="px-4 py-2">Options strategies</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Calmar</td>
+              <td className="px-4 py-2">No</td>
+              <td className="px-4 py-2">Yes (max DD)</td>
+              <td className="px-4 py-2">Tail risk assessment</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Never evaluate strategies on raw returns alone. The <strong>Sharpe ratio</strong> is
           the universal standard, but supplement it with the <strong>Sortino ratio</strong> for
-          asymmetric strategies (common in Bank Nifty options) and the <strong>Calmar ratio</strong>{' '}
-          to assess tail risk resilience. In Indian markets, a Sharpe ratio above 1.0 after
-          transaction costs is considered excellent for a fully systematic strategy.
+          asymmetric strategies (common in Bank Nifty options), the <strong>Calmar ratio</strong>{' '}
+          for tail risk, and the <strong>Omega ratio</strong> for non-normal distributions.
+          Always consider the <strong>statistical significance</strong> of your Sharpe estimate --
+          a 3-year track record with Sharpe 0.5 is barely significant. In Indian markets, a
+          Sharpe ratio above 1.0 after transaction costs is considered excellent for a fully
+          systematic strategy.
         </p>
       </NoteBlock>
     </div>

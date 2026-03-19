@@ -271,6 +271,97 @@ for a in allocs:
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Advanced Yield Strategies
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Sophisticated yield farming strategies go beyond simple LP provision to
+        include leveraged yield farming, auto-compounding, and cross-protocol
+        arbitrage:
+      </p>
+
+      <BlockMath math="\text{Leveraged Yield} = L \times \text{APY}_{\text{pool}} - (L - 1) \times r_{\text{borrow}} - L \times \text{IL}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="L" /> is the leverage factor and <InlineMath math="r_{\text{borrow}}" /> is
+        the borrowing cost. Leveraged farming amplifies both returns and IL risk.
+        The optimal leverage depends on the pool's fee yield relative to borrowing cost:
+      </p>
+
+      <BlockMath math="L^* = \frac{\text{APY}_{\text{pool}} - \text{IL}_{\text{expected}}}{\text{APY}_{\text{pool}} - r_{\text{borrow}} - \text{IL}_{\text{expected}}}" />
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Strategy</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Typical APY</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Risk Level</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Complexity</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Stablecoin LP (Curve)</td>
+              <td className="px-4 py-2">3--8%</td>
+              <td className="px-4 py-2">Low</td>
+              <td className="px-4 py-2">Low</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Blue-chip LP (Uniswap V3)</td>
+              <td className="px-4 py-2">10--25%</td>
+              <td className="px-4 py-2">Medium</td>
+              <td className="px-4 py-2">Medium</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Leveraged Farming</td>
+              <td className="px-4 py-2">20--60%</td>
+              <td className="px-4 py-2">High</td>
+              <td className="px-4 py-2">High</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Auto-Compounding Vaults</td>
+              <td className="px-4 py-2">5--15%</td>
+              <td className="px-4 py-2">Medium</td>
+              <td className="px-4 py-2">Low</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Delta-Neutral Farming</td>
+              <td className="px-4 py-2">8--20%</td>
+              <td className="px-4 py-2">Medium</td>
+              <td className="px-4 py-2">High</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <NoteBlock title="Smart Contract Risk" type="warning">
+        <p>
+          All DeFi yield farming carries smart contract risk -- the risk that a bug
+          in the protocol's code leads to loss of deposited funds. Notable examples
+          include the $600M Poly Network hack (2021), the $325M Wormhole exploit
+          (2022), and the $200M Euler Finance hack (2023). Risk mitigation includes:
+          only using audited protocols (multiple audits preferred), starting with
+          small positions, monitoring protocol TVL trends, and using DeFi insurance
+          (Nexus Mutual, InsurAce) for larger allocations. Indian DeFi users should
+          also consider that losses from smart contract exploits cannot be offset
+          against gains under the current 30% VDA tax regime.
+        </p>
+      </NoteBlock>
+
+      <NoteBlock title="Concentrated Liquidity (Uniswap V3)" type="historical">
+        <p>
+          Uniswap V3 introduced concentrated liquidity, where LPs specify a price
+          range for their capital. This dramatically increases capital efficiency
+          (up to 4000x for narrow ranges) but also increases impermanent loss risk
+          when price moves outside the range. The optimal range width depends on
+          the asset's volatility: <InlineMath math="\Delta P \approx 2\sigma\sqrt{T}" /> where{' '}
+          <InlineMath math="T" /> is the rebalancing frequency. Quantitative LP
+          strategies on Uniswap V3 actively manage range placement and width,
+          making it more akin to options market-making than passive liquidity provision.
+        </p>
+      </NoteBlock>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Quantitative yield farming requires decomposing returns into trading fees,

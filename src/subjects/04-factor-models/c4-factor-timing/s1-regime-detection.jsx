@@ -306,15 +306,94 @@ print(f"Improvement: {(cond_sharpe/equal_sharpe - 1)*100:+.1f}%")`}
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Alternative Regime Indicators for India
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Beyond India VIX, several macro and market indicators are useful for regime
+        detection in the Indian context:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Indicator</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Source</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Signal</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Lead Time</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">India VIX</td>
+              <td className="px-4 py-2">NSE</td>
+              <td className="px-4 py-2">&gt;25 = risk-off, &lt;12 = complacency</td>
+              <td className="px-4 py-2">Coincident</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">FII Net Flow (30d)</td>
+              <td className="px-4 py-2">NSDL</td>
+              <td className="px-4 py-2">Persistent outflow = risk-off</td>
+              <td className="px-4 py-2">Coincident/Leading</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Yield Curve (10Y-2Y)</td>
+              <td className="px-4 py-2">RBI/CCIL</td>
+              <td className="px-4 py-2">Inversion = recession risk</td>
+              <td className="px-4 py-2">6-12 month lead</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">INR/USD Momentum</td>
+              <td className="px-4 py-2">RBI</td>
+              <td className="px-4 py-2">Rapid depreciation = risk-off</td>
+              <td className="px-4 py-2">Coincident</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Credit Spreads</td>
+              <td className="px-4 py-2">FIMMDA</td>
+              <td className="px-4 py-2">Widening = stress</td>
+              <td className="px-4 py-2">Leading (1-3 months)</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Nifty Breadth (ADL)</td>
+              <td className="px-4 py-2">NSE</td>
+              <td className="px-4 py-2">Narrow breadth = fragile rally</td>
+              <td className="px-4 py-2">Leading (1-2 months)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        A composite regime indicator combining multiple signals tends to be more robust
+        than any single indicator. Weight the indicators by their historical predictive
+        power and combine them into a single score:
+      </p>
+
+      <BlockMath math="\text{Regime Score}_t = \sum_{j=1}^{J} w_j \cdot z_j(I_{j,t})" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="I_{j,t}" /> is indicator <InlineMath math="j" /> at time{' '}
+        <InlineMath math="t" />, <InlineMath math="z_j" /> is its z-score transformation,
+        and <InlineMath math="w_j" /> is the weight (typically inverse-volatility weighted).
+        A score below -1 indicates crisis, above +1 indicates risk-on, and between -1 and +1
+        is neutral. This composite approach avoids the fragility of depending on a single
+        indicator, which can produce false signals (e.g., India VIX can spike briefly around
+        F&O expiry without a genuine regime change).
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Regime detection is the most impactful application of factor timing. India VIX,
-          FII flows, and yield curve slope are the primary regime indicators for NSE. In
-          <strong> risk-on regimes</strong>: overweight momentum and underweight low-vol.
+          FII flows, yield curve slope, and credit spreads are the primary regime indicators
+          for NSE. Build a composite regime score from multiple indicators for robustness.
+          In <strong>risk-on regimes</strong>: overweight momentum and underweight low-vol.
           In <strong>risk-off/crisis</strong>: overweight quality, low-vol, and value while
           cutting momentum. Even a simple VIX-based regime indicator can improve multi-factor
           Sharpe ratios by 15-25% on Indian equity data. However, beware of overfitting --
-          validate regime rules on out-of-sample periods.
+          validate regime rules on out-of-sample periods and use composite indicators to
+          avoid false signals.
         </p>
       </NoteBlock>
     </div>

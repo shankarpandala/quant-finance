@@ -282,6 +282,82 @@ for desc, n_trades, trade_size, profit in scenarios:
         </p>
       </NoteBlock>
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Exchange Selection Framework
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For Indian quant traders, exchange selection involves a multi-factor
+        optimization considering fees, liquidity, latency, API quality, and
+        regulatory risk. The total cost of execution includes:
+      </p>
+
+      <BlockMath math="\text{Total Cost} = \underbrace{f_{\text{maker/taker}}}_{\text{exchange fee}} + \underbrace{\frac{s}{2}}_{\text{half-spread}} + \underbrace{\eta(Q)}_{\text{market impact}} + \underbrace{c_{\text{TDS}}}_{\text{India tax}} + \underbrace{c_{\text{FX}}}_{\text{forex cost}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        For a round-trip trade on an Indian exchange, the 1% TDS on each leg
+        adds 2% to the total cost, making it the dominant expense. On global exchanges,
+        the forex conversion cost (INR to USDT) adds approximately 0.5--1.5% depending
+        on the pathway (bank wire, P2P, or stablecoin on-ramp).
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Feature</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Indian CEX</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Global CEX</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">DEX</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">KYC Required</td>
+              <td className="px-4 py-2">Yes (Aadhaar)</td>
+              <td className="px-4 py-2">Yes</td>
+              <td className="px-4 py-2">No</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">INR On-ramp</td>
+              <td className="px-4 py-2">Direct (UPI/NEFT)</td>
+              <td className="px-4 py-2">P2P / Wire</td>
+              <td className="px-4 py-2">Via CEX</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">TDS Applicable</td>
+              <td className="px-4 py-2">Yes (1%)</td>
+              <td className="px-4 py-2">No</td>
+              <td className="px-4 py-2">No</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">API Quality</td>
+              <td className="px-4 py-2">Basic</td>
+              <td className="px-4 py-2">Excellent</td>
+              <td className="px-4 py-2">On-chain</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Derivatives</td>
+              <td className="px-4 py-2">Limited</td>
+              <td className="px-4 py-2">Full (perps, options)</td>
+              <td className="px-4 py-2">Growing (dYdX)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <NoteBlock title="PMLA Compliance" type="warning">
+        <p>
+          Under the Prevention of Money Laundering Act (PMLA) amendments of 2023,
+          all crypto exchanges operating in India (including offshore exchanges serving
+          Indian customers) must register as reporting entities with the Financial
+          Intelligence Unit (FIU-IND). Several global exchanges including Binance
+          were initially non-compliant but have since registered. Indian traders
+          should verify that their chosen exchange is FIU-registered to avoid
+          potential legal complications. Non-compliant exchange URLs may be blocked
+          by Indian ISPs per government directives.
+        </p>
+      </NoteBlock>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           The crypto exchange landscape presents vastly different economics for Indian
