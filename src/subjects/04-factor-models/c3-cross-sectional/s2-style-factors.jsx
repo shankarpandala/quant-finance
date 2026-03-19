@@ -290,6 +290,94 @@ print(f"Diversification benefit vs best single: Sharpe improved by {(sharpe_mf/m
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Smart Beta ETFs on NSE
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        NSE has launched several factor-based (smart beta) index ETFs that allow investors
+        to gain systematic factor exposure without building complex stock-selection
+        infrastructure. These products have grown rapidly since SEBI formalized factor
+        index guidelines:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Index</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Factor</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Selection Rule</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Rebalance</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">AUM (est.)</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Nifty 200 Momentum 30</td>
+              <td className="px-4 py-2">Momentum</td>
+              <td className="px-4 py-2">Top 30 by 6/12-mo momentum</td>
+              <td className="px-4 py-2">Semi-annual</td>
+              <td className="px-4 py-2">INR 10,000+ Cr</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Nifty 100 Low Vol 30</td>
+              <td className="px-4 py-2">Low Volatility</td>
+              <td className="px-4 py-2">Lowest 30 by 1-yr vol</td>
+              <td className="px-4 py-2">Quarterly</td>
+              <td className="px-4 py-2">INR 3,000+ Cr</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Nifty 200 Quality 30</td>
+              <td className="px-4 py-2">Quality</td>
+              <td className="px-4 py-2">Top 30 by ROE, D/E, earnings</td>
+              <td className="px-4 py-2">Semi-annual</td>
+              <td className="px-4 py-2">INR 2,000+ Cr</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">Nifty 50 Value 20</td>
+              <td className="px-4 py-2">Value</td>
+              <td className="px-4 py-2">Low P/E, P/B, high div yield</td>
+              <td className="px-4 py-2">Semi-annual</td>
+              <td className="px-4 py-2">INR 1,000+ Cr</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Nifty Alpha 50</td>
+              <td className="px-4 py-2">Alpha (Jensen's)</td>
+              <td className="px-4 py-2">Highest 1-yr alpha vs Nifty</td>
+              <td className="px-4 py-2">Quarterly</td>
+              <td className="px-4 py-2">INR 2,500+ Cr</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        These smart beta ETFs provide a low-cost (expense ratio 0.1-0.3%) way to implement
+        factor strategies. However, they suffer from index front-running (stocks are added/
+        removed on known rebalance dates), limited customization, and inability to combine
+        factors optimally. Serious quant practitioners build their own multi-factor models
+        using the factor scores as building blocks rather than relying on single-factor ETFs.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Factor Crowding Risk
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        As factor investing gains popularity in India, crowding risk increases. When too
+        many investors hold the same factor positions, several risks emerge:
+      </p>
+
+      <BlockMath math="\text{Crowding Risk} \propto \frac{\text{AUM in factor strategy}}{\text{Market cap of factor-tilted stocks}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        With INR 10,000+ Cr now in momentum ETFs on NSE, the stocks in Nifty 200 Momentum 30
+        may experience correlated selling during rebalances or momentum reversals. This
+        amplifies drawdowns beyond what historical backtests suggest, as the pre-2020 period
+        had much lower factor AUM. Always monitor factor valuations (are momentum stocks
+        becoming excessively expensive?) and flow data (are too many investors crowding in?)
+        as signals for potential factor regime change.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Style factors are the building blocks of systematic equity strategies. For Indian
@@ -297,7 +385,9 @@ print(f"Diversification benefit vs best single: Sharpe improved by {(sharpe_mf/m
           robust historical evidence on NSE. The key insight is that <strong>combining negatively
           correlated factors</strong> (especially value + momentum) dramatically improves the
           Sharpe ratio compared to any single factor. NSE now offers factor-based index ETFs
-          (Nifty 200 Momentum 30, Nifty 100 Low Vol 30) for cost-efficient factor exposure.
+          (Nifty 200 Momentum 30, Nifty 100 Low Vol 30) for cost-efficient factor exposure,
+          but beware of crowding risk as factor AUM grows. Build custom multi-factor models
+          for optimal factor combination and timing.
         </p>
       </NoteBlock>
     </div>

@@ -290,14 +290,92 @@ print(f"\\nFactor momentum adds {(comb_sharpe/eq_sharpe - 1)*100:+.1f}% to Sharp
         ]}
       />
 
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Factor Momentum vs. Factor Mean Reversion
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        Factor returns exhibit both momentum (at 1-12 month horizons) and mean reversion
+        (at 3-5 year horizons). This creates a dual opportunity for Indian quant strategies:
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="mx-auto my-4 text-sm border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Horizon</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Pattern</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Strategy</th>
+              <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">NSE Evidence</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-700 dark:text-gray-300">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">1-12 months</td>
+              <td className="px-4 py-2">Momentum</td>
+              <td className="px-4 py-2">Overweight recent winners</td>
+              <td className="px-4 py-2">AC = 0.10-0.20, Sharpe boost ~15%</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-2">12-36 months</td>
+              <td className="px-4 py-2">Transition</td>
+              <td className="px-4 py-2">Neutral / cautious</td>
+              <td className="px-4 py-2">Mixed signals</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2">3-5 years</td>
+              <td className="px-4 py-2">Mean reversion</td>
+              <td className="px-4 py-2">Buy underperforming factors</td>
+              <td className="px-4 py-2">Value after growth cycle</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        In Indian markets, the most dramatic example of factor mean reversion was the
+        value comeback in 2020-2022 after years of underperformance vs. quality/momentum
+        during 2017-2020. Patient investors who increased value allocation when the value
+        spread (valuation gap between cheap and expensive stocks) reached extreme levels
+        were rewarded with 15-20% outperformance.
+      </p>
+
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Implementing Factor Timing on NSE
+      </h3>
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        A practical implementation combines factor momentum with valuation signals:
+      </p>
+
+      <BlockMath math="w_k^* = w_k^{\text{base}} + \delta_k^{\text{mom}} + \delta_k^{\text{val}}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        where <InlineMath math="w_k^{\text{base}}" /> is the strategic factor weight (e.g.,
+        equal weight), <InlineMath math="\delta_k^{\text{mom}}" /> is the momentum tilt based
+        on recent 3-6 month factor returns, and <InlineMath math="\delta_k^{\text{val}}" /> is
+        the valuation tilt based on the factor's current value spread. The tilt magnitudes
+        should be constrained to prevent extreme positions:
+      </p>
+
+      <BlockMath math="|\delta_k| \leq 0.15 \quad \text{(max 15\% tilt from base)}" />
+
+      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        This constraint ensures the portfolio always maintains exposure to all factors,
+        avoiding the risk of being completely out of a factor that suddenly reverses
+        (as momentum did in March 2020 on NSE). The combined momentum + valuation approach
+        historically adds 20-30% to the Sharpe ratio vs. static allocation on Indian data,
+        with improved maximum drawdown characteristics.
+      </p>
+
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
           Factor momentum is a powerful meta-strategy that exploits the persistence of factor
           premia. On NSE data, factor returns exhibit monthly autocorrelation of 0.10-0.20,
           creating a tradeable signal. The optimal lookback for Indian markets is 3-6 months.
           Factor momentum <strong>adds 10-20% to the Sharpe ratio</strong> of a static
-          multi-factor portfolio and helps explain individual stock momentum. Combine factor
-          momentum with regime detection for the most robust dynamic factor allocation strategy.
+          multi-factor portfolio and helps explain individual stock momentum. For the most
+          robust approach, combine short-term factor momentum (1-12 months) with long-term
+          factor valuation mean reversion (3-5 years). Always constrain tilts to maintain
+          diversified factor exposure, protecting against sudden regime changes.
         </p>
       </NoteBlock>
     </div>
