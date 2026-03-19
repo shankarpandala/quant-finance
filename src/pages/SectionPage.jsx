@@ -1,0 +1,161 @@
+import { useParams, Link } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { motion } from 'framer-motion'
+import { getCurriculumById, getChapterById, getSectionById } from '../subjects/index.js'
+
+const CONTENT_REGISTRY = {
+  '01-math-foundations/c1-probability-statistics/s1-probability-distributions': lazy(() => import('../subjects/01-math-foundations/c1-probability-statistics/s1-probability-distributions.jsx')),
+  '01-math-foundations/c1-probability-statistics/s2-statistical-inference': lazy(() => import('../subjects/01-math-foundations/c1-probability-statistics/s2-statistical-inference.jsx')),
+  '01-math-foundations/c1-probability-statistics/s3-bayesian-foundations': lazy(() => import('../subjects/01-math-foundations/c1-probability-statistics/s3-bayesian-foundations.jsx')),
+  '01-math-foundations/c2-linear-algebra/s1-matrix-operations': lazy(() => import('../subjects/01-math-foundations/c2-linear-algebra/s1-matrix-operations.jsx')),
+  '01-math-foundations/c2-linear-algebra/s2-pca-svd': lazy(() => import('../subjects/01-math-foundations/c2-linear-algebra/s2-pca-svd.jsx')),
+  '01-math-foundations/c3-stochastic-calculus/s1-brownian-motion': lazy(() => import('../subjects/01-math-foundations/c3-stochastic-calculus/s1-brownian-motion.jsx')),
+  '01-math-foundations/c3-stochastic-calculus/s2-itos-lemma': lazy(() => import('../subjects/01-math-foundations/c3-stochastic-calculus/s2-itos-lemma.jsx')),
+  '01-math-foundations/c3-stochastic-calculus/s3-sde-simulation': lazy(() => import('../subjects/01-math-foundations/c3-stochastic-calculus/s3-sde-simulation.jsx')),
+  '01-math-foundations/c4-time-series-math/s1-stationarity-ergodicity': lazy(() => import('../subjects/01-math-foundations/c4-time-series-math/s1-stationarity-ergodicity.jsx')),
+  '01-math-foundations/c4-time-series-math/s2-arima-foundations': lazy(() => import('../subjects/01-math-foundations/c4-time-series-math/s2-arima-foundations.jsx')),
+  '01-math-foundations/c4-time-series-math/s3-cointegration': lazy(() => import('../subjects/01-math-foundations/c4-time-series-math/s3-cointegration.jsx')),
+  '02-financial-markets/c1-market-structure/s1-exchanges-venues': lazy(() => import('../subjects/02-financial-markets/c1-market-structure/s1-exchanges-venues.jsx')),
+  '02-financial-markets/c1-market-structure/s2-order-types': lazy(() => import('../subjects/02-financial-markets/c1-market-structure/s2-order-types.jsx')),
+  '02-financial-markets/c1-market-structure/s3-matching-engines': lazy(() => import('../subjects/02-financial-markets/c1-market-structure/s3-matching-engines.jsx')),
+  '02-financial-markets/c2-asset-classes/s1-equities-etfs': lazy(() => import('../subjects/02-financial-markets/c2-asset-classes/s1-equities-etfs.jsx')),
+  '02-financial-markets/c2-asset-classes/s2-fixed-income': lazy(() => import('../subjects/02-financial-markets/c2-asset-classes/s2-fixed-income.jsx')),
+  '02-financial-markets/c2-asset-classes/s3-derivatives-overview': lazy(() => import('../subjects/02-financial-markets/c2-asset-classes/s3-derivatives-overview.jsx')),
+  '05-algo-trading/c1-mean-reversion/s1-pairs-trading': lazy(() => import('../subjects/05-algo-trading/c1-mean-reversion/s1-pairs-trading.jsx')),
+  '05-algo-trading/c1-mean-reversion/s2-stat-arb': lazy(() => import('../subjects/05-algo-trading/c1-mean-reversion/s2-stat-arb.jsx')),
+  '05-algo-trading/c1-mean-reversion/s3-kalman-filters': lazy(() => import('../subjects/05-algo-trading/c1-mean-reversion/s3-kalman-filters.jsx')),
+  '05-algo-trading/c2-momentum-trend/s1-time-series-momentum': lazy(() => import('../subjects/05-algo-trading/c2-momentum-trend/s1-time-series-momentum.jsx')),
+  '05-algo-trading/c2-momentum-trend/s2-cross-sectional-momentum': lazy(() => import('../subjects/05-algo-trading/c2-momentum-trend/s2-cross-sectional-momentum.jsx')),
+  '05-algo-trading/c2-momentum-trend/s3-managed-volatility': lazy(() => import('../subjects/05-algo-trading/c2-momentum-trend/s3-managed-volatility.jsx')),
+  '05-algo-trading/c3-market-making/s1-market-making-basics': lazy(() => import('../subjects/05-algo-trading/c3-market-making/s1-market-making-basics.jsx')),
+  '05-algo-trading/c3-market-making/s2-order-flow': lazy(() => import('../subjects/05-algo-trading/c3-market-making/s2-order-flow.jsx')),
+  '05-algo-trading/c3-market-making/s3-latency-considerations': lazy(() => import('../subjects/05-algo-trading/c3-market-making/s3-latency-considerations.jsx')),
+  '05-algo-trading/c4-event-driven/s1-earnings-strategies': lazy(() => import('../subjects/05-algo-trading/c4-event-driven/s1-earnings-strategies.jsx')),
+  '05-algo-trading/c4-event-driven/s2-news-sentiment': lazy(() => import('../subjects/05-algo-trading/c4-event-driven/s2-news-sentiment.jsx')),
+  '05-algo-trading/c5-execution-algos/s1-twap-vwap': lazy(() => import('../subjects/05-algo-trading/c5-execution-algos/s1-twap-vwap.jsx')),
+  '05-algo-trading/c5-execution-algos/s2-optimal-execution': lazy(() => import('../subjects/05-algo-trading/c5-execution-algos/s2-optimal-execution.jsx')),
+  '05-algo-trading/c5-execution-algos/s3-smart-order-routing': lazy(() => import('../subjects/05-algo-trading/c5-execution-algos/s3-smart-order-routing.jsx')),
+  '06-options-pricing/c1-black-scholes/s1-bsm-derivation': lazy(() => import('../subjects/06-options-pricing/c1-black-scholes/s1-bsm-derivation.jsx')),
+  '06-options-pricing/c1-black-scholes/s2-put-call-parity': lazy(() => import('../subjects/06-options-pricing/c1-black-scholes/s2-put-call-parity.jsx')),
+  '06-options-pricing/c1-black-scholes/s3-quantlib-pricing': lazy(() => import('../subjects/06-options-pricing/c1-black-scholes/s3-quantlib-pricing.jsx')),
+  '09-portfolio-optimization/c1-mean-variance/s1-markowitz': lazy(() => import('../subjects/09-portfolio-optimization/c1-mean-variance/s1-markowitz.jsx')),
+  '09-portfolio-optimization/c1-mean-variance/s2-estimation-error': lazy(() => import('../subjects/09-portfolio-optimization/c1-mean-variance/s2-estimation-error.jsx')),
+  '09-portfolio-optimization/c1-mean-variance/s3-constraints': lazy(() => import('../subjects/09-portfolio-optimization/c1-mean-variance/s3-constraints.jsx')),
+  '09-portfolio-optimization/c2-risk-parity/s1-equal-risk-contribution': lazy(() => import('../subjects/09-portfolio-optimization/c2-risk-parity/s1-equal-risk-contribution.jsx')),
+  '09-portfolio-optimization/c2-risk-parity/s2-hierarchical-risk-parity': lazy(() => import('../subjects/09-portfolio-optimization/c2-risk-parity/s2-hierarchical-risk-parity.jsx')),
+  '09-portfolio-optimization/c2-risk-parity/s3-inverse-vol': lazy(() => import('../subjects/09-portfolio-optimization/c2-risk-parity/s3-inverse-vol.jsx')),
+  '09-portfolio-optimization/c3-black-litterman/s1-equilibrium-returns': lazy(() => import('../subjects/09-portfolio-optimization/c3-black-litterman/s1-equilibrium-returns.jsx')),
+  '09-portfolio-optimization/c3-black-litterman/s2-views-blending': lazy(() => import('../subjects/09-portfolio-optimization/c3-black-litterman/s2-views-blending.jsx')),
+  '09-portfolio-optimization/c3-black-litterman/s3-bl-extensions': lazy(() => import('../subjects/09-portfolio-optimization/c3-black-litterman/s3-bl-extensions.jsx')),
+  '09-portfolio-optimization/c4-robust-optimization/s1-robust-methods': lazy(() => import('../subjects/09-portfolio-optimization/c4-robust-optimization/s1-robust-methods.jsx')),
+  '09-portfolio-optimization/c4-robust-optimization/s2-regime-aware': lazy(() => import('../subjects/09-portfolio-optimization/c4-robust-optimization/s2-regime-aware.jsx')),
+  '09-portfolio-optimization/c4-robust-optimization/s3-multi-period': lazy(() => import('../subjects/09-portfolio-optimization/c4-robust-optimization/s3-multi-period.jsx')),
+  '10-portfolio-management/c1-rebalancing/s1-calendar-threshold': lazy(() => import('../subjects/10-portfolio-management/c1-rebalancing/s1-calendar-threshold.jsx')),
+  '10-portfolio-management/c1-rebalancing/s2-tax-aware': lazy(() => import('../subjects/10-portfolio-management/c1-rebalancing/s2-tax-aware.jsx')),
+  '10-portfolio-management/c1-rebalancing/s3-transition-management': lazy(() => import('../subjects/10-portfolio-management/c1-rebalancing/s3-transition-management.jsx')),
+  '10-portfolio-management/c2-risk-management/s1-position-sizing': lazy(() => import('../subjects/10-portfolio-management/c2-risk-management/s1-position-sizing.jsx')),
+  '10-portfolio-management/c2-risk-management/s2-stop-losses': lazy(() => import('../subjects/10-portfolio-management/c2-risk-management/s2-stop-losses.jsx')),
+  '10-portfolio-management/c2-risk-management/s3-correlation-crisis': lazy(() => import('../subjects/10-portfolio-management/c2-risk-management/s3-correlation-crisis.jsx')),
+  '10-portfolio-management/c3-tail-risk/s1-tail-hedging': lazy(() => import('../subjects/10-portfolio-management/c3-tail-risk/s1-tail-hedging.jsx')),
+  '10-portfolio-management/c3-tail-risk/s2-drawdown-control': lazy(() => import('../subjects/10-portfolio-management/c3-tail-risk/s2-drawdown-control.jsx')),
+  '10-portfolio-management/c4-multi-asset/s1-asset-allocation': lazy(() => import('../subjects/10-portfolio-management/c4-multi-asset/s1-asset-allocation.jsx')),
+  '10-portfolio-management/c4-multi-asset/s2-currency-hedging': lazy(() => import('../subjects/10-portfolio-management/c4-multi-asset/s2-currency-hedging.jsx')),
+  '10-portfolio-management/c4-multi-asset/s3-alternatives-integration': lazy(() => import('../subjects/10-portfolio-management/c4-multi-asset/s3-alternatives-integration.jsx')),
+  '14-rl-trading/c1-rl-foundations/s1-mdp-formulation': lazy(() => import('../subjects/14-rl-trading/c1-rl-foundations/s1-mdp-formulation.jsx')),
+  '14-rl-trading/c1-rl-foundations/s2-reward-shaping': lazy(() => import('../subjects/14-rl-trading/c1-rl-foundations/s2-reward-shaping.jsx')),
+  '14-rl-trading/c1-rl-foundations/s3-gym-environments': lazy(() => import('../subjects/14-rl-trading/c1-rl-foundations/s3-gym-environments.jsx')),
+  '14-rl-trading/c2-policy-methods/s1-ppo-trading': lazy(() => import('../subjects/14-rl-trading/c2-policy-methods/s1-ppo-trading.jsx')),
+  '14-rl-trading/c2-policy-methods/s2-a2c-a3c': lazy(() => import('../subjects/14-rl-trading/c2-policy-methods/s2-a2c-a3c.jsx')),
+  '14-rl-trading/c2-policy-methods/s3-sac-trading': lazy(() => import('../subjects/14-rl-trading/c2-policy-methods/s3-sac-trading.jsx')),
+  '14-rl-trading/c3-drl-portfolio/s1-multi-asset-rl': lazy(() => import('../subjects/14-rl-trading/c3-drl-portfolio/s1-multi-asset-rl.jsx')),
+  '14-rl-trading/c3-drl-portfolio/s2-hierarchical-rl': lazy(() => import('../subjects/14-rl-trading/c3-drl-portfolio/s2-hierarchical-rl.jsx')),
+  '14-rl-trading/c3-drl-portfolio/s3-safe-rl': lazy(() => import('../subjects/14-rl-trading/c3-drl-portfolio/s3-safe-rl.jsx')),
+  '14-rl-trading/c4-rl-execution/s1-optimal-execution-rl': lazy(() => import('../subjects/14-rl-trading/c4-rl-execution/s1-optimal-execution-rl.jsx')),
+  '14-rl-trading/c4-rl-execution/s2-rl-market-making': lazy(() => import('../subjects/14-rl-trading/c4-rl-execution/s2-rl-market-making.jsx')),
+  '15-alt-data-nlp/c1-alternative-data/s1-alt-data-landscape': lazy(() => import('../subjects/15-alt-data-nlp/c1-alternative-data/s1-alt-data-landscape.jsx')),
+  '15-alt-data-nlp/c1-alternative-data/s2-data-evaluation': lazy(() => import('../subjects/15-alt-data-nlp/c1-alternative-data/s2-data-evaluation.jsx')),
+  '15-alt-data-nlp/c1-alternative-data/s3-geospatial-data': lazy(() => import('../subjects/15-alt-data-nlp/c1-alternative-data/s3-geospatial-data.jsx')),
+  '15-alt-data-nlp/c2-nlp-sentiment/s1-text-preprocessing': lazy(() => import('../subjects/15-alt-data-nlp/c2-nlp-sentiment/s1-text-preprocessing.jsx')),
+  '15-alt-data-nlp/c2-nlp-sentiment/s2-sentiment-models': lazy(() => import('../subjects/15-alt-data-nlp/c2-nlp-sentiment/s2-sentiment-models.jsx')),
+  '18-forward-testing/c1-paper-trading/s1-paper-setup': lazy(() => import('../subjects/18-forward-testing/c1-paper-trading/s1-paper-setup.jsx')),
+  '18-forward-testing/c1-paper-trading/s2-backtest-reconciliation': lazy(() => import('../subjects/18-forward-testing/c1-paper-trading/s2-backtest-reconciliation.jsx')),
+  '18-forward-testing/c1-paper-trading/s3-statistical-validation': lazy(() => import('../subjects/18-forward-testing/c1-paper-trading/s3-statistical-validation.jsx')),
+  '18-forward-testing/c2-live-deployment/s1-system-architecture': lazy(() => import('../subjects/18-forward-testing/c2-live-deployment/s1-system-architecture.jsx')),
+  '18-forward-testing/c2-live-deployment/s2-broker-integration': lazy(() => import('../subjects/18-forward-testing/c2-live-deployment/s2-broker-integration.jsx')),
+  '18-forward-testing/c2-live-deployment/s3-cloud-deployment': lazy(() => import('../subjects/18-forward-testing/c2-live-deployment/s3-cloud-deployment.jsx')),
+  '18-forward-testing/c3-monitoring/s1-real-time-monitoring': lazy(() => import('../subjects/18-forward-testing/c3-monitoring/s1-real-time-monitoring.jsx')),
+  '18-forward-testing/c3-monitoring/s2-anomaly-detection': lazy(() => import('../subjects/18-forward-testing/c3-monitoring/s2-anomaly-detection.jsx')),
+  '18-forward-testing/c4-operational-risk/s1-fat-finger-protection': lazy(() => import('../subjects/18-forward-testing/c4-operational-risk/s1-fat-finger-protection.jsx')),
+  '18-forward-testing/c4-operational-risk/s2-strategy-lifecycle': lazy(() => import('../subjects/18-forward-testing/c4-operational-risk/s2-strategy-lifecycle.jsx')),
+  '18-forward-testing/c4-operational-risk/s3-compliance-reporting': lazy(() => import('../subjects/18-forward-testing/c4-operational-risk/s3-compliance-reporting.jsx')),
+  '19-strategy-research/c1-research-methodology/s1-hypothesis-driven': lazy(() => import('../subjects/19-strategy-research/c1-research-methodology/s1-hypothesis-driven.jsx')),
+  '19-strategy-research/c1-research-methodology/s2-research-notebooks': lazy(() => import('../subjects/19-strategy-research/c1-research-methodology/s2-research-notebooks.jsx')),
+  '19-strategy-research/c1-research-methodology/s3-literature-review': lazy(() => import('../subjects/19-strategy-research/c1-research-methodology/s3-literature-review.jsx')),
+  '19-strategy-research/c2-false-discovery/s1-multiple-testing': lazy(() => import('../subjects/19-strategy-research/c2-false-discovery/s1-multiple-testing.jsx')),
+  '19-strategy-research/c2-false-discovery/s2-backtest-overfitting': lazy(() => import('../subjects/19-strategy-research/c2-false-discovery/s2-backtest-overfitting.jsx')),
+  '19-strategy-research/c2-false-discovery/s3-out-of-sample': lazy(() => import('../subjects/19-strategy-research/c2-false-discovery/s3-out-of-sample.jsx')),
+  '19-strategy-research/c3-strategy-evaluation/s1-due-diligence': lazy(() => import('../subjects/19-strategy-research/c3-strategy-evaluation/s1-due-diligence.jsx')),
+}
+
+function ComingSoon({ subjectId, chapterId, sectionId }) {
+  const subject = getCurriculumById(subjectId)
+  const chapter = getChapterById(subjectId, chapterId)
+  const section = getSectionById(subjectId, chapterId, sectionId)
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-12 text-center">
+      <div className="text-6xl mb-4">🚧</div>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+        {section?.title || 'Section'} — Coming Soon
+      </h2>
+      <p className="text-gray-500 dark:text-gray-400 mb-6">
+        This section is being written. Check back soon for the full content.
+      </p>
+      <div className="flex justify-center gap-4">
+        {chapter && (
+          <Link
+            to={`/subjects/${subjectId}/${chapterId}`}
+            className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:border-indigo-400 hover:text-indigo-700 transition-colors dark:border-gray-700 dark:text-gray-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+          >
+            ← Back to {chapter.title}
+          </Link>
+        )}
+        <Link
+          to={`/subjects/${subjectId}`}
+          className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+        >
+          View All Sections
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+export default function SectionPage() {
+  const { subjectId, chapterId, sectionId } = useParams()
+  const key = `${subjectId}/${chapterId}/${sectionId}`
+  const ContentComponent = CONTENT_REGISTRY[key]
+
+  if (!ContentComponent) {
+    return <ComingSoon subjectId={subjectId} chapterId={chapterId} sectionId={sectionId} />
+  }
+
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[40vh] text-gray-400">
+          Loading section…
+        </div>
+      }
+    >
+      <motion.div
+        key={key}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <ContentComponent />
+      </motion.div>
+    </Suspense>
+  )
+}
