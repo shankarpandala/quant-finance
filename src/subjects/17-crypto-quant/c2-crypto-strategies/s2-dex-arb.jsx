@@ -238,15 +238,15 @@ print("=" * 55)
 print(f"\\nPool: ETH/USDT")
 print(f"  Reserve X (ETH): {amm.x:,.0f}")
 print(f"  Reserve Y (USDT): {amm.y:,.0f}")
-print(f"  Spot Price: ${amm.spot_price:,.2f}")
+print(f"  Spot Price: \${amm.spot_price:,.2f}")
 print(f"  k (invariant): {amm.k:,.0f}")
 
 # Test swaps at different sizes
 print(f"\\nSwap Analysis:")
 for size in [1, 5, 10, 50, 100]:
     result = amm.swap_x_for_y(size)
-    print(f"  Swap {size:>3d} ETH -> ${result['amount_out']:>10,.2f} USDT "
-          f"(price: ${result['execution_price']:,.2f}, "
+    print(f"  Swap {size:>3d} ETH -> \${result['amount_out']:>10,.2f} USDT "
+          f"(price: \${result['execution_price']:,.2f}, "
           f"impact: {result['price_impact_pct']:.2f}%)")
 
 # Arbitrage simulation
@@ -258,8 +258,8 @@ print(f"  Opportunities found: {len(opportunities)}")
 if opportunities:
     total_profit = sum(o['net_profit'] for o in opportunities)
     avg_profit = np.mean([o['net_profit'] for o in opportunities])
-    print(f"  Total profit:   ${total_profit:,.2f}")
-    print(f"  Avg per trade:  ${avg_profit:,.2f}")
+    print(f"  Total profit:   \${total_profit:,.2f}")
+    print(f"  Avg per trade:  \${avg_profit:,.2f}")
     print(f"  Avg impact:     {np.mean([o['impact'] for o in opportunities]):.2f}%")`}
       />
 

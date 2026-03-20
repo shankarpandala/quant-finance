@@ -266,12 +266,12 @@ print(f"  Market signal: {'BULLISH' if batch['avg_score'] > 0.05 else 'BEARISH' 
           {
             step: 'Lexicon-based analysis',
             formula: '\text{score}_{\text{lex}} = \frac{|\text{pos\_words}| - |\text{neg\_words}|}{|\text{total\_words}|} = \frac{1 - 1}{20} = 0',
-            explanation: 'Lexicon approach finds 'maintains' (neutral/positive) and 'withdrawal' (negative), yielding near-zero sentiment. But this misses the financial meaning.',
+            explanation: "Lexicon approach finds 'maintains' (neutral/positive) and 'withdrawal' (negative), yielding near-zero sentiment. But this misses the financial meaning.",
           },
           {
             step: 'FinBERT contextual analysis',
             formula: 'P(\text{hawkish}|\text{text}) = 0.65, \quad P(\text{dovish}) = 0.15',
-            explanation: 'FinBERT understands that 'withdrawal of accommodation' is hawkish (tightening) which is negative for rate-sensitive stocks (HDFCBANK, BAJFINANCE) but neutral-to-positive for banks with high CASA ratios.',
+            explanation: "FinBERT understands that 'withdrawal of accommodation' is hawkish (tightening) which is negative for rate-sensitive stocks (HDFCBANK, BAJFINANCE) but neutral-to-positive for banks with high CASA ratios.",
           },
           {
             step: 'Trading signal',

@@ -220,7 +220,7 @@ print(f"  Autocorrelation:  {np.corrcoef(funding_rates[:-1], funding_rates[1:])[
 pnl = perp.funding_pnl(funding_rates, position_size=100000, direction='short')
 sharpe = np.mean(np.diff(pnl)) / np.std(np.diff(pnl)) * np.sqrt(3 * 365)
 print(f"\\nDelta-Neutral Funding Strategy ($100K):")
-print(f"  Total PnL:        ${pnl[-1]:,.2f}")
+print(f"  Total PnL:        \${pnl[-1]:,.2f}")
 print(f"  Annualized Sharpe: {sharpe:.2f}")
 
 # Cross-exchange liquidity
@@ -232,9 +232,9 @@ frag.add_exchange('Coinbase', bid=64995, ask=65005, depth=2000000)
 
 bbo = frag.global_bbo()
 print(f"\\nGlobal BBO (BTC/USDT):")
-print(f"  Best Bid: ${bbo['best_bid']:,} ({bbo['bid_exchange']})")
-print(f"  Best Ask: ${bbo['best_ask']:,} ({bbo['ask_exchange']})")
-print(f"  Global Spread: ${bbo['global_spread']:,}")
+print(f"  Best Bid: \${bbo['best_bid']:,} ({bbo['bid_exchange']})")
+print(f"  Best Ask: \${bbo['best_ask']:,} ({bbo['ask_exchange']})")
+print(f"  Global Spread: \${bbo['global_spread']:,}")
 
 arbs = frag.cross_exchange_arb()
 if arbs:

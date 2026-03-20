@@ -245,7 +245,7 @@ for data in btc_data:
     signal = metrics.generate_composite_signal(m)
 
     print(f"\\n{data['date']}:")
-    print(f"  Market Cap:    ${data['market_cap']/1e9:.0f}B")
+    print(f"  Market Cap:    \${data['market_cap']/1e9:.0f}B")
     print(f"  NVT Ratio:     {m['nvt']:.1f} ({m['nvt_signal']['signal']})")
     print(f"  MVRV Ratio:    {m['mvrv']:.2f}")
     print(f"  Metcalfe Dev:  {m['metcalfe_dev']:+.3f}")

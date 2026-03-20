@@ -229,11 +229,11 @@ for regime_name, mean_f, vol_f in regimes:
     risk = strategy.risk_metrics(funding)
 
     print(f"\\n--- {regime_name} ---")
-    print(f"  Total PnL:      ${result['total_pnl']:>10,.2f}")
+    print(f"  Total PnL:      \${result['total_pnl']:>10,.2f}")
     print(f"  Ann. Return:    {result['ann_return']:>9.1%}")
     print(f"  Sharpe Ratio:   {result['sharpe']:>9.2f}")
     print(f"  Win Rate:       {result['win_rate']:>9.1%}")
-    print(f"  Max Drawdown:   ${result['max_drawdown']:>10,.2f}")
+    print(f"  Max Drawdown:   \${result['max_drawdown']:>10,.2f}")
     print(f"  Neg Funding %:  {risk['neg_funding_pct']:>9.1%}")
     print(f"  Max Neg Streak: {risk['max_neg_streak']:>9d} periods")`}
       />

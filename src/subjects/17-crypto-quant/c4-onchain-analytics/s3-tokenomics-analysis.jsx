@@ -328,8 +328,8 @@ sell_pressure = analyzer.estimate_sell_pressure(daily_volume=5_000_000)
 print("\\n--- Sell Pressure from Unlocks ---")
 for sp in sell_pressure:
     print(f"  Month {sp['month']:2d} ({sp['category']:>10}): "
-          f"Unlock=${sp['unlock_value']/1e6:.1f}M, "
-          f"Sell=${sp['sell_pressure']/1e6:.1f}M, "
+          f"Unlock=\${sp['unlock_value']/1e6:.1f}M, "
+          f"Sell=\${sp['sell_pressure']/1e6:.1f}M, "
           f"Impact={sp['est_price_impact']:.1%}")
 
 # 2. Indian VDA Tax Impact

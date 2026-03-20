@@ -405,9 +405,9 @@ for key, val in costs.items():
         if 'inr' in key:
             print(f"  {key:20s}: INR {val:>10,.0f}")
         else:
-            print(f"  {key:20s}: ${val:>10,.2f}")
+            print(f"  {key:20s}: \${val:>10,.2f}")
     else:
-        print(f"  {key:20s}: ${val:>10,.2f}")
+        print(f"  {key:20s}: \${val:>10,.2f}")
 
 # Show Docker compose
 print(f"\\n=== Docker Compose (Local Testing) ===")
