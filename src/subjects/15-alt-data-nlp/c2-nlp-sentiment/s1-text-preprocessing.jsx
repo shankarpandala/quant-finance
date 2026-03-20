@@ -257,7 +257,7 @@ class IndianFinancialPreprocessor:
 
         # Handle numbers
         if preserve_numbers:
-            text = self.percentage_pattern.sub(r'<PERCENT:\1>', text)
+            text = self.percentage_pattern.sub(r'<PERCENT:\\1>', text)
             text = self.indian_number_pattern.sub(
                 lambda m: f'<AMOUNT:{self.parse_indian_number(m.group()):.0f}>',
                 text
