@@ -1,0 +1,1 @@
+import{u as t}from"./index-VdcZM7J3.js";function n(){const o=t(e=>e.markSectionComplete),s=t(e=>e.isComplete),r=t(e=>e.getSubjectProgress),c=t(e=>e.completedSections);return{markComplete:o,isComplete:s,getSubjectProgress:r,completedSections:c}}export{n as u};
