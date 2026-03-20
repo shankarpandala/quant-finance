@@ -84,7 +84,7 @@ export default function SectionLayout({ title, difficulty, readingTime, children
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="max-w-3xl mx-auto px-4 py-8"
+      className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8"
     >
       {/* Breadcrumbs */}
       <div className="mb-6">
