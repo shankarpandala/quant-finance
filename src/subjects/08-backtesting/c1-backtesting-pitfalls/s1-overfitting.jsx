@@ -131,7 +131,7 @@ export default function Overfitting() {
             <tr className="border-b border-gray-200 dark:border-gray-700">
               <td className="px-4 py-2">Too many rules</td>
               <td className="px-4 py-2">Complex entry/exit logic</td>
-              <td className="px-4 py-2">Buy Nifty if MA20>MA50 AND RSI AND VIX AND...</td>
+              <td className="px-4 py-2">{"Buy Nifty if MA20>MA50 AND RSI AND VIX AND..."}</td>
             </tr>
             <tr className="border-b border-gray-200 dark:border-gray-700">
               <td className="px-4 py-2">Period-specific</td>

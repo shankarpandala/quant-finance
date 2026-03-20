@@ -224,7 +224,7 @@ print(f"{'Exchange':<15} {'$10K':>10} {'$100K':>10} {'$1M':>10}")
 print("-" * 50)
 for name in analyzer.exchanges:
     costs = [analyzer.compute_cost(name, s)['total'] for s in [10000, 100000, 1000000]]
-    print(f"{name:<15} ${costs[0]:>8.2f} ${costs[1]:>8.2f} ${costs[2]:>8.2f}")
+    print(f"{name:<15} \${costs[0]:>8.2f} \${costs[1]:>8.2f} \${costs[2]:>8.2f}")
 
 # Indian tax impact
 print("\\nIndian VDA Tax Impact Analysis:")

@@ -258,8 +258,8 @@ print(f"\\nPosition Summary ({n_positions} positions):")
 print(f"  Avg Health Factor: {np.mean(hfs):.3f}")
 print(f"  Min Health Factor: {np.min(hfs):.3f}")
 print(f"  Avg LTV:           {np.mean(ltvs):.1%}")
-print(f"  Total Collateral:  ${sum(p.collateral_value for p in positions):,.0f}")
-print(f"  Total Debt:        ${sum(p.debt_amount for p in positions):,.0f}")
+print(f"  Total Collateral:  \${sum(p.collateral_value for p in positions):,.0f}")
+print(f"  Total Debt:        \${sum(p.debt_amount for p in positions):,.0f}")
 
 # Current liquidation opportunities
 bot = LiquidationBot(gas_cost=10, min_profit=20)
@@ -267,8 +267,8 @@ opps = bot.scan_positions(positions)
 print(f"\\nCurrent Liquidation Opportunities: {len(opps)}")
 for opp in opps[:3]:
     print(f"  Position: {opp['position']}")
-    print(f"    Repay: ${opp['debt_repaid']:,.0f} -> Seize: ${opp['collateral_value']:,.0f}")
-    print(f"    Net Profit: ${opp['net_profit']:,.0f}")
+    print(f"    Repay: \${opp['debt_repaid']:,.0f} -> Seize: \${opp['collateral_value']:,.0f}")
+    print(f"    Net Profit: \${opp['net_profit']:,.0f}")
 
 # Crash simulation
 positions_copy = [DeFiLendingPosition(
@@ -281,8 +281,8 @@ print(f"\\n--- Crash Simulation (30% ETH drop) ---")
 for r in results:
     print(f"  Step {r['step']}: -{r['price_drop']:.0f}% | "
           f"Liquidations: {r['liquidations']} | "
-          f"Value: ${r['value_liquidated']:,.0f}")
-print(f"  Total Liquidated: ${total_liq:,.0f}")`}
+          f"Value: \${r['value_liquidated']:,.0f}")
+print(f"  Total Liquidated: \${total_liq:,.0f}")`}
       />
 
       <ExampleBlock

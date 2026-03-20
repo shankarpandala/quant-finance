@@ -242,7 +242,7 @@ allocs = optimizer.optimize_allocation(pools, total_capital=50000)
 print(f"\\nOptimal Allocation ($50K):")
 for a in allocs:
     if a['allocation'] > 0:
-        print(f"  {a['pool']:30s}: ${a['allocation']:>8,.0f} "
+        print(f"  {a['pool']:30s}: \${a['allocation']:>8,.0f} "
               f"({a['weight']:.0%}) Net APY: {a['net_apy']:.1%}")`}
       />
 

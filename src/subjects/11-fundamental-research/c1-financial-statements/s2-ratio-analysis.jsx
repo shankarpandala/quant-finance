@@ -142,7 +142,7 @@ print("  HDFC Bank: Banking leverage naturally high (deposits)")`}
 
       <NoteBlock title="Key Takeaway" type="tip">
         <p>
-          Financial ratios standardize company comparison across Nifty 50 constituents. DuPont decomposition reveals the source of ROE: margin-driven (IT companies), turnover-driven (FMCG), or leverage-driven (banks). For Indian stock selection, ROE > 15% with low D/E is a strong quality signal.
+          {"Financial ratios standardize company comparison across Nifty 50 constituents. DuPont decomposition reveals the source of ROE: margin-driven (IT companies), turnover-driven (FMCG), or leverage-driven (banks). For Indian stock selection, ROE > 15% with low D/E is a strong quality signal."}
         </p>
       </NoteBlock>
     </div>
