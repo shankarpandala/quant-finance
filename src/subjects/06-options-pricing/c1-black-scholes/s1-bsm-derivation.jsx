@@ -129,7 +129,7 @@ export default function BSMDerivation() {
       <TheoremBlock
         title="Black-Scholes PDE"
         label="Theorem 6.1"
-        statement={<>Any derivative $V(S,t)$ on a non-dividend-paying stock must satisfy: $$\\frac{\\partial V}{\\partial t} + rS\\frac{\\partial V}{\\partial S} + \\frac{1}{2}\\sigma^2 S^2 \\frac{\\partial^2 V}{\\partial S^2} = rV$$ This PDE arises from constructing a riskless portfolio of the option and the underlying (delta-hedging), and invoking no-arbitrage.</>}
+        statement={<>Any derivative V(S,t) on a non-dividend-paying stock must satisfy: dV/dt + rS(dV/dS) + (1/2)sigma^2 S^2 (d^2V/dS^2) = rV. This PDE arises from constructing a riskless portfolio of the option and the underlying (delta-hedging), and invoking no-arbitrage.</>}
       />
 
       <InteractiveBSMPricer />

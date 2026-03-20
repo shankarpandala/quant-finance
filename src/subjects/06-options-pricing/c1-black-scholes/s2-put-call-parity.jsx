@@ -104,7 +104,7 @@ export default function PutCallParity() {
       <TheoremBlock
         title="No-Arbitrage Put-Call Parity"
         label="Theorem 6.2"
-        statement={<>If put-call parity is violated, a riskless arbitrage exists. Specifically, if $C - P > S - Ke^{-rT}$, sell the call, buy the put, buy the stock, and borrow $Ke^{-rT}$ to earn a riskless profit. If $C - P < S - Ke^{-rT}$, buy the call, sell the put, short the stock, and lend $Ke^{-rT}$. The profit equals the magnitude of the parity violation minus transaction costs.</>}
+        statement={<>If put-call parity is violated, a riskless arbitrage exists. Specifically, if C − P &gt; S − Ke⁻ʳᵀ, sell the call, buy the put, buy the stock, and borrow Ke⁻ʳᵀ to earn a riskless profit. If C − P &lt; S − Ke⁻ʳᵀ, buy the call, sell the put, short the stock, and lend Ke⁻ʳᵀ. The profit equals the magnitude of the parity violation minus transaction costs.</>}
       />
 
       <InteractivePutCallParity />

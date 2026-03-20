@@ -43,7 +43,7 @@ function InteractiveViz() {
               <text x={55 + i * 75} y={155} textAnchor="middle" className="text-[8px] fill-gray-500">{c}</text>
             </g>
           )
-        }}
+        })}
       </svg>
     </div>
   )
