@@ -108,7 +108,7 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
             <Link
               key={subject.id}
               to={`/subjects/${subject.id}`}
-              className="px-3 py-1.5 rounded-md text-sm text-zinc-600 dark:text-zinc-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors whitespace-nowrap truncate max-w-[160px]"
+              className="shrink-0 px-3 py-1.5 rounded-md text-sm text-zinc-600 dark:text-zinc-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors whitespace-nowrap"
               title={subject.title}
             >
               {subject.icon && <span className="mr-1.5">{subject.icon}</span>}
