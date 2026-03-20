@@ -73,7 +73,7 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-950/90 backdrop-blur supports-[backdrop-filter]:bg-white/75 dark:supports-[backdrop-filter]:bg-zinc-950/75">
-      <div className="max-w-screen-2xl mx-auto flex h-14 items-center gap-2 px-4">
+      <div className="flex h-14 items-center gap-2 px-4">
 
         {/* Hamburger – mobile only */}
         <button
